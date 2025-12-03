@@ -23,7 +23,7 @@ export default function Forum() {
                 const res = await fetch('/api/forum/posts');
                 if (res.ok) {
                     const data = await res.json();
-                    setQuestions(data);
+                    setQuestions(data.posts || []);
                 }
             } catch (error) {
                 console.error('Failed to fetch questions', error);

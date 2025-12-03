@@ -5,6 +5,7 @@ import Card from '@/components/Card';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useLanguage } from '@/contexts/LanguageContext';
+import FileBadge from '@/components/FileBadge';
 
 export default function Notes() {
     const [notes, setNotes] = useState([]);
@@ -67,20 +68,7 @@ export default function Notes() {
         }
     };
 
-    const getFileExtension = (filename) => {
-        const ext = filename.split('.').pop().toUpperCase();
-        const colors = {
-            'PDF': '#E74C3C',
-            'DOCX': '#3498DB',
-            'DOC': '#3498DB',
-            'PPTX': '#E67E22',
-            'PPT': '#E67E22',
-            'TXT': '#95A5A6',
-            'XLSX': '#27AE60',
-            'XLS': '#27AE60'
-        };
-        return { ext, color: colors[ext] || '#7F8C8D' };
-    };
+
 
     const handleEditClick = (note) => {
         setEditingNote(note);
@@ -379,60 +367,18 @@ export default function Notes() {
                                         if (urls.length > 0) {
                                             return (
                                                 <div style={{ marginTop: '1rem', borderTop: '1px solid var(--border)', paddingTop: '0.8rem' }}>
-                                                    {urls.slice(0, 2).map((url, index) => {
-                                                        const filename = url.split('/').pop();
-                                                        const { ext, color } = getFileExtension(filename);
-                                                        return (
-                                                            <a
+                                                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
+                                                        {urls.slice(0, 3).map((url, index) => (
+                                                            <FileBadge
                                                                 key={index}
-                                                                href={`/api/download?url=${encodeURIComponent(url)}`}
-                                                                onClick={(e) => e.stopPropagation()}
-                                                                style={{
-                                                                    display: 'flex',
-                                                                    alignItems: 'center',
-                                                                    gap: '0.5rem',
-                                                                    padding: '0.5rem 0.8rem',
-                                                                    backgroundColor: 'var(--secondary)',
-                                                                    borderRadius: '6px',
-                                                                    textDecoration: 'none',
-                                                                    marginBottom: '0.4rem',
-                                                                    transition: 'all 0.2s ease'
-                                                                }}
-                                                                onMouseEnter={(e) => {
-                                                                    e.currentTarget.style.backgroundColor = 'rgba(225, 48, 108, 0.1)';
-                                                                }}
-                                                                onMouseLeave={(e) => {
-                                                                    e.currentTarget.style.backgroundColor = 'var(--secondary)';
-                                                                }}
-                                                            >
-                                                                <span style={{
-                                                                    backgroundColor: color,
-                                                                    color: 'white',
-                                                                    padding: '0.2rem 0.4rem',
-                                                                    borderRadius: '4px',
-                                                                    fontSize: '0.7rem',
-                                                                    fontWeight: 'bold',
-                                                                    minWidth: '45px',
-                                                                    textAlign: 'center'
-                                                                }}>
-                                                                    {ext}
-                                                                </span>
-                                                                <span style={{
-                                                                    color: 'var(--text)',
-                                                                    fontSize: '0.85rem',
-                                                                    overflow: 'hidden',
-                                                                    textOverflow: 'ellipsis',
-                                                                    whiteSpace: 'nowrap',
-                                                                    flex: 1
-                                                                }}>
-                                                                    📥 {t.common.download || 'Download'}
-                                                                </span>
-                                                            </a>
-                                                        );
-                                                    })}
-                                                    {urls.length > 2 && (
-                                                        <span style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
-                                                            +{urls.length - 2} {t.language === 'tr' ? 'dosya daha' : 'more files'}
+                                                                url={`/api/download?url=${encodeURIComponent(url)}`}
+                                                                fileName={url.split('/').pop()}
+                                                            />
+                                                        ))}
+                                                    </div>
+                                                    {urls.length > 3 && (
+                                                        <span style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', display: 'block', marginTop: '0.5rem' }}>
+                                                            +{urls.length - 3} {t.language === 'tr' ? 'dosya daha' : 'more files'}
                                                         </span>
                                                     )}
                                                 </div>

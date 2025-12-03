@@ -34,7 +34,8 @@ export default function FeaturesSection() {
             const forumRes = await fetch('/api/forum/posts');
             if (forumRes.ok) {
                 const forumData = await forumRes.json();
-                const filtered = forumData
+                const posts = forumData.posts || [];
+                const filtered = posts
                     .filter(post => !post.title.includes('Not Paylaşıldı') && !post.title.includes('Paylaş'))
                     .sort((a, b) => (b.viewCount || 0) - (a.viewCount || 0))
                     .slice(0, 6); // Get top 6 for rotation
@@ -45,7 +46,8 @@ export default function FeaturesSection() {
             const notesRes = await fetch('/api/forum/posts');
             if (notesRes.ok) {
                 const notesData = await notesRes.json();
-                const shared = notesData
+                const posts = notesData.posts || [];
+                const shared = posts
                     .filter(post => post.title.includes('Not Paylaşıldı') || post.title.includes('Paylaş'))
                     .slice(0, 6); // Get 6 for rotation
                 setSharedNotes(shared);

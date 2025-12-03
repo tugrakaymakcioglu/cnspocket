@@ -1,50 +1,64 @@
 import { NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
-import { PrismaClient } from '@prisma/client';
+import prisma from '@/lib/prisma';
 import { writeFile, mkdir } from 'fs/promises';
+import { existsSync } from 'fs';
 import path from 'path';
 
-const globalForPrisma = global;
-
-const prismaClient = globalForPrisma.prisma || new PrismaClient();
-
-if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = prismaClient;
-
-export async function GET() {
+export async function GET(req) {
     try {
-        const posts = await prismaClient.post.findMany({
-            where: { isVisible: true },
+        const { searchParams } = new URL(req.url);
+        const page = parseInt(searchParams.get('page')) || 1;
+        const limit = parseInt(searchParams.get('limit')) || 10;
+        const skip = (page - 1) * limit;
+
+        const posts = await prisma.post.findMany({
+            where: {
+                isDeleted: false,
+                isVisible: true
+            },
             include: {
                 author: {
                     select: {
+                        id: true,
                         name: true,
-                        email: true,
-                        avatar: true,
                         username: true,
-                        university: true,
-                        department: true,
-                    },
+                        avatar: true
+                    }
                 },
                 _count: {
                     select: {
                         replies: true,
                         votes: true
-                    },
-                },
-                votes: {
-                    select: {
-                        type: true
                     }
-                }
+                },
+                votes: true // Include votes to check if current user voted (will filter in frontend or map here if needed, but keeping simple for now)
             },
             orderBy: {
-                createdAt: 'desc',
+                createdAt: 'desc'
             },
+            skip,
+            take: limit
         });
 
-        return NextResponse.json(posts);
+        const total = await prisma.post.count({
+            where: {
+                isDeleted: false,
+                isVisible: true
+            }
+        });
+
+        return NextResponse.json({
+            posts,
+            pagination: {
+                total,
+                pages: Math.ceil(total / limit),
+                page,
+                limit
+            }
+        });
+
     } catch (error) {
         console.error('Error fetching posts:', error);
         return NextResponse.json({ error: 'Error fetching posts' }, { status: 500 });
@@ -63,72 +77,53 @@ export async function POST(req) {
         const title = formData.get('title');
         const content = formData.get('content');
         const tags = formData.get('tags');
-        const files = formData.getAll('files'); // Get all files
-
-        console.log('Received POST request');
-        console.log('Title:', title);
-        console.log('Files count:', files.length);
+        const files = formData.getAll('files');
 
         if (!title || !content) {
             return NextResponse.json({ error: 'Title and content are required' }, { status: 400 });
         }
 
-        if (files.length > 5) {
-            return NextResponse.json({ error: 'Maximum 5 files allowed' }, { status: 400 });
-        }
-
-        // Find user by email to get ID
-        const user = await prismaClient.user.findUnique({
-            where: { email: session.user.email },
-        });
-
-        if (!user) {
-            return NextResponse.json({ error: 'User not found' }, { status: 404 });
-        }
-
         const fileUrls = [];
-
         if (files && files.length > 0) {
-            const uploadDir = path.join(process.cwd(), 'public/uploads');
-            console.log('Upload directory:', uploadDir);
-            await mkdir(uploadDir, { recursive: true });
+            const uploadDir = path.join(process.cwd(), 'public', 'uploads', 'forum');
+            if (!existsSync(uploadDir)) {
+                await mkdir(uploadDir, { recursive: true });
+            }
 
             for (const file of files) {
-                console.log('Processing file:', file.name, 'Size:', file.size);
-                if (file.size > 0) {
-                    const buffer = Buffer.from(await file.arrayBuffer());
+                // Skip if file is empty or not a file object
+                if (file && file.size > 0 && typeof file.arrayBuffer === 'function') {
+                    const bytes = await file.arrayBuffer();
+                    const buffer = Buffer.from(bytes);
+
+                    // Generate unique filename
                     const randomId = Math.random().toString(36).substring(2, 8);
-                    const originalName = file.name.replace(/\.[^/.]+$/, '').replaceAll(' ', '_');
+                    const originalName = file.name.replace(/\.[^/.]+$/, '');
                     const extension = file.name.split('.').pop();
                     const filename = `${originalName}_${randomId}.${extension}`;
+                    const filepath = path.join(uploadDir, filename);
 
-                    try {
-                        const filepath = path.join(uploadDir, filename);
-                        console.log('Saving to:', filepath);
-                        await writeFile(filepath, buffer);
-                        fileUrls.push(`/uploads/${filename}`);
-                        console.log('File saved successfully');
-                    } catch (e) {
-                        console.error('Error saving file:', e);
-                        return NextResponse.json({ error: 'Error saving file' }, { status: 500 });
-                    }
+                    await writeFile(filepath, buffer);
+                    fileUrls.push(`/uploads/forum/${filename}`);
                 }
             }
         }
 
-        const post = await prismaClient.post.create({
+        const post = await prisma.post.create({
             data: {
                 title,
                 content,
                 tags: tags || '',
-                fileUrls: JSON.stringify(fileUrls), // Store as JSON string
-                authorId: user.id,
-            },
+                authorId: session.user.id,
+                fileUrls: fileUrls.length > 0 ? JSON.stringify(fileUrls) : null
+            }
         });
 
         return NextResponse.json(post, { status: 201 });
+
     } catch (error) {
         console.error('Error creating post:', error);
-        return NextResponse.json({ error: 'Error creating post' }, { status: 500 });
+        console.error('Error stack:', error.stack);
+        return NextResponse.json({ error: 'Error creating post', details: error.message }, { status: 500 });
     }
 }

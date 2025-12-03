@@ -44,7 +44,8 @@ export default function Calendar() {
             // Fetch forum posts
             const forumRes = await fetch('/api/forum/posts');
             if (forumRes.ok) {
-                const posts = await forumRes.json();
+                const data = await forumRes.json();
+                const posts = data.posts || [];
                 const userPosts = posts.filter(p => p.authorId === session?.user?.id);
                 userPosts.forEach(post => {
                     allEvents.push({
