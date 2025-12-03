@@ -1,0 +1,26 @@
+# Project: UniConnect (Student Platform)
+
+- [ ] **Project Setup & Configuration**
+    - [ ] Initialize Next.js project
+    - [ ] Setup folder structure
+    - [ ] Configure global styles (CSS variables, reset)
+- [ ] **Design System & Core Components**
+    - [ ] Create color palette and typography system
+    - [ ] Build Layout (Header, Footer, Sidebar)
+    - [ ] Build UI Kit (Buttons, Cards, Inputs, Modals)
+- [ ] **Feature Implementation: Home & Navigation**
+    - [ ] Design and build Landing Page / Dashboard
+    - [ ] Implement Navigation logic
+- [ ] **Feature Implementation: Notes & Resources**
+    - [ ] Create Course listing view
+    - [ ] Create Note upload/view interface
+- [ ] **Feature Implementation: Q&A Forum**
+    - [ ] Create Question list view
+    - [ ] Create Question detail & Answer view
+- [ ] **Feature Implementation: User Profile**
+    - [ ] Create Profile page
+    - [ ] Implement basic user settings
+- [ ] **Verification & Polish**
+    - [ ] Responsive design check
+    - [ ] Interactive elements verification
+    - [ ] Final walkthrough

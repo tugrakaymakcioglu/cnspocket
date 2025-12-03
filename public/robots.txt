@@ -1,0 +1,11 @@
+# https://www.notvarmı.com/robots.txt
+
+User-agent: *
+Allow: /
+Disallow: /api/
+Disallow: /admin/
+Disallow: /messages/
+Disallow: /settings/
+
+# Sitemap
+Sitemap: https://www.notvarmı.com/sitemap.xml

@@ -1,0 +1,483 @@
+'use client';
+
+import { useState, useEffect } from 'react';
+import Card from '@/components/Card';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { useLanguage } from '@/contexts/LanguageContext';
+
+export default function Notes() {
+    const [notes, setNotes] = useState([]);
+    const [courses, setCourses] = useState([]);
+    const [selectedCourse, setSelectedCourse] = useState('');
+    const [loading, setLoading] = useState(true);
+    const router = useRouter();
+    const { t } = useLanguage();
+
+    // Edit state
+    const [showEditModal, setShowEditModal] = useState(false);
+    const [editingNote, setEditingNote] = useState(null);
+    const [updating, setUpdating] = useState(false);
+    const [deleting, setDeleting] = useState(false);
+
+    useEffect(() => {
+        fetchCourses();
+        fetchNotes();
+    }, []);
+
+    useEffect(() => {
+        fetchNotes();
+    }, [selectedCourse]);
+
+    const fetchCourses = async () => {
+        try {
+            const res = await fetch('/api/courses');
+            if (res.ok) {
+                const data = await res.json();
+                setCourses(data);
+            }
+        } catch (error) {
+            console.error('Error fetching courses:', error);
+        }
+    };
+
+    const fetchNotes = async () => {
+        try {
+            const url = selectedCourse ? `/api/notes?courseId=${selectedCourse}` : '/api/notes';
+            const res = await fetch(url);
+            if (res.ok) {
+                const data = await res.json();
+                setNotes(data);
+            }
+        } catch (error) {
+            console.error('Error fetching notes:', error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const getFileExtension = (filename) => {
+        const ext = filename.split('.').pop().toUpperCase();
+        const colors = {
+            'PDF': '#E74C3C',
+            'DOCX': '#3498DB',
+            'DOC': '#3498DB',
+            'PPTX': '#E67E22',
+            'PPT': '#E67E22',
+            'TXT': '#95A5A6',
+            'XLSX': '#27AE60',
+            'XLS': '#27AE60'
+        };
+        return { ext, color: colors[ext] || '#7F8C8D' };
+    };
+
+    const handleEditClick = (note) => {
+        setEditingNote(note);
+        setShowEditModal(true);
+    };
+
+    const handleUpdateNote = async (e) => {
+        e.preventDefault();
+        if (!editingNote.title || !editingNote.description || !editingNote.courseId) {
+            alert(t.notes.fillAllFields || 'Lütfen tüm alanları doldurun');
+            return;
+        }
+
+        setUpdating(true);
+        try {
+            const res = await fetch(`/api/notes/${editingNote.id}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(editingNote)
+            });
+
+            if (res.ok) {
+                const updated = await res.json();
+                setNotes(notes.map(n => n.id === updated.id ? updated : n));
+                setShowEditModal(false);
+                setEditingNote(null);
+            } else {
+                alert(t.notes.updateError || 'Not güncellenirken hata oluştu');
+            }
+        } catch (error) {
+            console.error('Error updating note:', error);
+            alert(t.notes.updateError || 'Not güncellenirken hata oluştu');
+        } finally {
+            setUpdating(false);
+        }
+    };
+
+    const handleDeleteNote = async () => {
+        if (!confirm(t.notes.deleteConfirm || 'Bu notu silmek istediğinizden emin misiniz?')) {
+            return;
+        }
+
+        setDeleting(true);
+        try {
+            const res = await fetch(`/api/notes/${editingNote.id}`, {
+                method: 'DELETE'
+            });
+
+            if (res.ok) {
+                setNotes(notes.filter(n => n.id !== editingNote.id));
+                setShowEditModal(false);
+                setEditingNote(null);
+            } else {
+                alert(t.notes.deleteError || 'Not silinirken hata oluştu');
+            }
+        } catch (error) {
+            console.error('Error deleting note:', error);
+            alert(t.notes.deleteError || 'Not silinirken hata oluştu');
+        } finally {
+            setDeleting(false);
+        }
+    };
+
+    return (
+        <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '2rem 1rem' }}>
+            {/* Header */}
+            <div style={{ textAlign: 'center', marginBottom: '3rem' }}>
+                <h1 style={{
+                    fontSize: '2.5rem',
+                    marginBottom: '1rem',
+                    background: 'var(--primary-gradient)',
+                    WebkitBackgroundClip: 'text',
+                    WebkitTextFillColor: 'transparent'
+                }}>{t.notes.title}</h1>
+                <p style={{ color: 'var(--text-secondary)', fontSize: '1.1rem' }}>
+                    {t.notes.subtitle}
+                </p>
+            </div>
+
+            {/* Action Bar */}
+            <div style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                marginBottom: '2rem',
+                gap: '1rem',
+                flexWrap: 'wrap'
+            }}>
+                {/* Course Filter */}
+                <select
+                    value={selectedCourse}
+                    onChange={(e) => setSelectedCourse(e.target.value)}
+                    style={{
+                        padding: '0.8rem 1.2rem',
+                        borderRadius: '8px',
+                        border: '1px solid var(--border)',
+                        backgroundColor: 'var(--secondary)',
+                        color: 'var(--text)',
+                        fontSize: '0.95rem',
+                        outline: 'none',
+                        cursor: 'pointer',
+                        minWidth: '200px'
+                    }}
+                >
+                    <option value="">{t.notes.allCourses}</option>
+                    {courses.map(course => (
+                        <option key={course.id} value={course.id}>
+                            {course.code} - {course.name}
+                        </option>
+                    ))}
+                </select>
+
+                {/* Upload Button */}
+                <Link href="/notes/upload" style={{
+                    padding: '0.8rem 1.5rem',
+                    backgroundColor: 'var(--primary)',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: '8px',
+                    cursor: 'pointer',
+                    fontWeight: 'bold',
+                    fontSize: '1rem',
+                    transition: 'all 0.2s ease',
+                    boxShadow: '0 4px 14px rgba(225, 48, 108, 0.3)',
+                    textDecoration: 'none',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '0.5rem'
+                }}
+                    onMouseEnter={(e) => {
+                        e.currentTarget.style.transform = 'translateY(-2px)';
+                        e.currentTarget.style.boxShadow = '0 6px 20px rgba(225, 48, 108, 0.4)';
+                    }}
+                    onMouseLeave={(e) => {
+                        e.currentTarget.style.transform = 'translateY(0)';
+                        e.currentTarget.style.boxShadow = '0 4px 14px rgba(225, 48, 108, 0.3)';
+                    }}>
+                    📝 {t.notes.uploadNote}
+                </Link>
+            </div>
+
+            {/* Notes Grid */}
+            {loading ? (
+                <div style={{
+                    textAlign: 'center',
+                    padding: '3rem',
+                    color: 'var(--text-secondary)'
+                }}>
+                    <div style={{
+                        width: '50px',
+                        height: '50px',
+                        border: '4px solid var(--border)',
+                        borderTop: '4px solid var(--primary)',
+                        borderRadius: '50%',
+                        margin: '0 auto 1rem',
+                        animation: 'spin 1s linear infinite'
+                    }} />
+                    <p>{t.notes.loading}</p>
+                    <style jsx>{`
+                        @keyframes spin {
+                            0% { transform: rotate(0deg); }
+                            100% { transform: rotate(360deg); }
+                        }
+                    `}</style>
+                </div>
+            ) : notes.length > 0 ? (
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '1.5rem' }}>
+                    {notes.map(note => (
+                        <div key={note.id} style={{
+                            transition: 'transform 0.2s ease',
+                            cursor: 'pointer'
+                        }}
+                            onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-4px)'}
+                            onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}
+                            onClick={() => handleEditClick(note)}>
+                            <Card title={note.title}>
+                                {/* Description Preview */}
+                                <p style={{
+                                    color: 'var(--text-secondary)',
+                                    fontSize: '0.9rem',
+                                    marginBottom: '1rem',
+                                    lineHeight: '1.5',
+                                    display: '-webkit-box',
+                                    WebkitLineClamp: 3,
+                                    WebkitBoxOrient: 'vertical',
+                                    overflow: 'hidden'
+                                }}>
+                                    {note.description}
+                                </p>
+
+                                {/* Course Badge */}
+                                <div style={{
+                                    display: 'inline-block',
+                                    padding: '0.3rem 0.8rem',
+                                    backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                                    borderRadius: '6px',
+                                    fontSize: '0.8rem',
+                                    fontWeight: '600',
+                                    color: 'var(--accent-blue)',
+                                    marginBottom: '0.8rem',
+                                    border: '1px solid rgba(59, 130, 246, 0.2)'
+                                }}>
+                                    {note.course.code}
+                                </div>
+
+                                {/* Tags */}
+                                {note.tags && (
+                                    <div style={{ display: 'flex', gap: '0.4rem', marginBottom: '1rem', flexWrap: 'wrap' }}>
+                                        {note.tags.split(',').slice(0, 3).map((tag, index) => {
+                                            const colors = [
+                                                { bg: 'rgba(59, 130, 246, 0.1)', border: 'rgba(59, 130, 246, 0.3)', text: 'var(--accent-blue)' },
+                                                { bg: 'rgba(139, 92, 246, 0.1)', border: 'rgba(139, 92, 246, 0.3)', text: 'var(--accent-purple)' },
+                                                { bg: 'rgba(20, 184, 166, 0.1)', border: 'rgba(20, 184, 166, 0.3)', text: 'var(--accent-teal)' },
+                                                { bg: 'rgba(245, 158, 11, 0.1)', border: 'rgba(245, 158, 11, 0.3)', text: 'var(--accent-amber)' },
+                                                { bg: 'rgba(99, 102, 241, 0.1)', border: 'rgba(99, 102, 241, 0.3)', text: 'var(--accent-indigo)' },
+                                            ];
+                                            const colorScheme = colors[index % colors.length];
+                                            return (
+                                                <span key={index} style={{
+                                                    fontSize: '0.75rem',
+                                                    padding: '0.2rem 0.6rem',
+                                                    borderRadius: '4px',
+                                                    backgroundColor: colorScheme.bg,
+                                                    color: colorScheme.text,
+                                                    border: `1px solid ${colorScheme.border}`,
+                                                    fontWeight: '500'
+                                                }}>
+                                                    #{tag.trim()}
+                                                </span>
+                                            );
+                                        })}
+                                    </div>
+                                )}
+
+                                {/* Files */}
+                                {note.fileUrls && (() => {
+                                    try {
+                                        const urls = JSON.parse(note.fileUrls);
+                                        if (urls.length > 0) {
+                                            return (
+                                                <div style={{ marginTop: '1rem', borderTop: '1px solid var(--border)', paddingTop: '0.8rem' }}>
+                                                    {urls.slice(0, 2).map((url, index) => {
+                                                        const filename = url.split('/').pop();
+                                                        const { ext, color } = getFileExtension(filename);
+                                                        return (
+                                                            <a
+                                                                key={index}
+                                                                href={url}
+                                                                download
+                                                                onClick={(e) => e.stopPropagation()}
+                                                                style={{
+                                                                    display: 'flex',
+                                                                    alignItems: 'center',
+                                                                    gap: '0.5rem',
+                                                                    padding: '0.5rem 0.8rem',
+                                                                    backgroundColor: 'var(--secondary)',
+                                                                    borderRadius: '6px',
+                                                                    textDecoration: 'none',
+                                                                    marginBottom: '0.4rem',
+                                                                    transition: 'all 0.2s ease'
+                                                                }}
+                                                                onMouseEnter={(e) => {
+                                                                    e.currentTarget.style.backgroundColor = 'rgba(225, 48, 108, 0.1)';
+                                                                }}
+                                                                onMouseLeave={(e) => {
+                                                                    e.currentTarget.style.backgroundColor = 'var(--secondary)';
+                                                                }}
+                                                            >
+                                                                <span style={{
+                                                                    backgroundColor: color,
+                                                                    color: 'white',
+                                                                    padding: '0.2rem 0.4rem',
+                                                                    borderRadius: '4px',
+                                                                    fontSize: '0.7rem',
+                                                                    fontWeight: 'bold',
+                                                                    minWidth: '45px',
+                                                                    textAlign: 'center'
+                                                                }}>
+                                                                    {ext}
+                                                                </span>
+                                                                <span style={{
+                                                                    color: 'var(--text)',
+                                                                    fontSize: '0.85rem',
+                                                                    overflow: 'hidden',
+                                                                    textOverflow: 'ellipsis',
+                                                                    whiteSpace: 'nowrap',
+                                                                    flex: 1
+                                                                }}>
+                                                                    📥 {t.common.download || 'Download'}
+                                                                </span>
+                                                            </a>
+                                                        );
+                                                    })}
+                                                    {urls.length > 2 && (
+                                                        <span style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
+                                                            +{urls.length - 2} {t.language === 'tr' ? 'dosya daha' : 'more files'}
+                                                        </span>
+                                                    )}
+                                                </div>
+                                            );
+                                        }
+                                    } catch (e) { return null; }
+                                })()}
+
+                                {/* Date */}
+                                <div style={{
+                                    marginTop: '1rem',
+                                    fontSize: '0.8rem',
+                                    color: 'var(--text-secondary)'
+                                }}>
+                                    {new Date(note.createdAt).toLocaleDateString()}
+                                </div>
+
+                                {/* Edit Button */}
+                                <div style={{
+                                    marginTop: '1rem',
+                                    paddingTop: '1rem',
+                                    borderTop: '1px solid var(--border)',
+                                    display: 'flex',
+                                    justifyContent: 'flex-end'
+                                }}>
+                                    <div style={{
+                                        padding: '0.4rem 0.8rem',
+                                        background: 'rgba(139, 92, 246, 0.1)',
+                                        border: '1px solid rgba(139, 92, 246, 0.3)',
+                                        borderRadius: '8px',
+                                        fontSize: '0.85rem',
+                                        color: 'var(--accent-purple)',
+                                        fontWeight: '600',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        gap: '0.5rem'
+                                    }}>
+                                        ✏️ {t.common.edit || 'Düzenle'}
+                                    </div>
+                                </div>
+                            </Card>
+                        </div>
+                    ))}
+                </div>
+            ) : (
+                <div style={{
+                    textAlign: 'center',
+                    padding: '4rem 2rem',
+                    color: 'var(--text-secondary)',
+                    backgroundColor: 'var(--secondary)',
+                    borderRadius: '16px',
+                    border: '1px solid var(--border)'
+                }}>
+                    <div style={{ fontSize: '4rem', marginBottom: '1rem' }}>📚</div>
+                    <h3 style={{ color: 'var(--text)', marginBottom: '0.5rem' }}>{t.notes.noNotes}</h3>
+                    <p>{t.notes.noNotesDesc}</p>
+                </div>
+            )}
+
+            {/* Edit Note Modal */}
+            {
+                showEditModal && editingNote && (
+                    <div style={{
+                        position: 'fixed',
+                        top: 0,
+                        left: 0,
+                        right: 0,
+                        bottom: 0,
+                        backgroundColor: 'rgba(0,0,0,0.7)',
+                        backdropFilter: 'blur(4px)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        zIndex: 1000,
+                        padding: '1rem'
+                    }}
+                        onClick={() => {
+                            setShowEditModal(false);
+                            setEditingNote(null);
+                        }}>
+                        <div style={{
+                            backgroundColor: 'var(--secondary)',
+                            borderRadius: '20px',
+                            padding: '2.5rem',
+                            maxWidth: '600px',
+                            width: '100%',
+                            boxShadow: '0 20px 60px rgba(0,0,0,0.3)',
+                            border: '1px solid var(--border)',
+                            maxHeight: '90vh',
+                            overflowY: 'auto'
+                        }}
+                            onClick={(e) => e.stopPropagation()}>
+
+                            <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
+                                <div style={{
+                                    width: '70px',
+                                    height: '70px',
+                                    borderRadius: '16px',
+                                    background: 'linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%)',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    fontSize: '2rem',
+                                    margin: '0 auto 1rem',
+                                    boxShadow: '0 10px 30px rgba(139, 92, 246, 0.3)'
+                                }}>
+                                    ✏️
+                                </div>
+                                <h2 style={{ marginBottom: '0.5rem', color: 'var(--text)', fontSize: '1.5rem' }}>
+                                    {t.notes.editNote || 'Notu Düzenle'}
+                                </h2>
+            }
+                            </div >
+                            );
+}

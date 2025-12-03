@@ -1,0 +1,184 @@
+:root {
+    --primary: #E1306C;
+    --primary-gradient: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
+    --secondary: #fafafa;
+    --background: #ffffff;
+    --text: #262626;
+    --text-secondary: #8e8e8e;
+    --neon-green: #64ffda;
+    --border: #dbdbdb;
+
+    /* Accent Colors for diverse theming */
+    --accent-blue: #3b82f6;
+    --accent-purple: #8b5cf6;
+    --accent-teal: #14b8a6;
+    --accent-amber: #f59e0b;
+    --accent-indigo: #6366f1;
+
+    /* Responsive Spacing */
+    --spacing-xs: 0.25rem;
+    --spacing-sm: 0.5rem;
+    --spacing-md: 1rem;
+    --spacing-lg: 2rem;
+    --spacing-xl: 3rem;
+
+    /* Font Sizes */
+    --font-size-xs: 0.75rem;
+    --font-size-sm: 0.875rem;
+    --font-size-base: 1rem;
+    --font-size-lg: 1.125rem;
+    --font-size-xl: 1.25rem;
+    --font-size-2xl: 1.5rem;
+    --font-size-3xl: 1.875rem;
+    --font-size-4xl: 2.25rem;
+
+    /* Touch Targets */
+    --touch-target-min: 44px;
+}
+
+[data-theme='dark'] {
+    --primary: #E1306C;
+    --primary-gradient: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
+    --secondary: #121212;
+    --background: #000000;
+    --text: #fafafa;
+    --text-secondary: #a8a8a8;
+    --neon-green: #64ffda;
+    --border: #262626;
+
+    /* Accent Colors - Adjusted for dark mode */
+    --accent-blue: #60a5fa;
+    --accent-purple: #a78bfa;
+    --accent-teal: #2dd4bf;
+    --accent-amber: #fbbf24;
+    --accent-indigo: #818cf8;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background-color: var(--background);
+    color: var(--text);
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+@keyframes shake {
+
+    0%,
+    100% {
+        transform: translateX(0);
+    }
+
+    10%,
+    30%,
+    50%,
+    70%,
+    90% {
+        transform: translateX(-5px);
+    }
+
+    20%,
+    40%,
+    60%,
+    80% {
+        transform: translateX(5px);
+    }
+}
+
+.shake {
+    animation: shake 0.5s cubic-bezier(.36, .07, .19, .97) both;
+}
+
+@keyframes slideDown {
+    from {
+        transform: translate(-50%, -100%);
+        opacity: 0;
+    }
+
+    to {
+        transform: translate(-50%, 20px);
+        opacity: 1;
+    }
+}
+
+.slide-down {
+    animation: slideDown 0.5s ease-out forwards;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+    width: 10px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--secondary);
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--text-secondary);
+    border-radius: 5px;
+    border: 2px solid var(--secondary);
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--primary);
+}
+
+/* Responsive Main Padding */
+.responsive-main {
+    padding: 2rem !important;
+}
+
+/* Responsive Footer */
+.responsive-footer {
+    padding: 2rem;
+}
+
+/* Mobile Utility Classes */
+.mobile-only {
+    display: none;
+}
+
+.desktop-only {
+    display: block;
+}
+
+/* Mobile Responsive Styles */
+@media (max-width: 767px) {
+    .responsive-main {
+        padding: 1rem !important;
+    }
+
+    .responsive-footer {
+        padding: 1rem !important;
+    }
+
+    .responsive-footer p {
+        font-size: 0.85rem;
+    }
+
+    .mobile-only {
+        display: block;
+    }
+
+    .desktop-only {
+        display: none;
+    }
+
+    .mobile-full-width {
+        width: 100% !important;
+    }
+
+    .mobile-stack {
+        flex-direction: column !important;
+    }
+
+    .mobile-center {
+        text-align: center !important;
+    }
+}

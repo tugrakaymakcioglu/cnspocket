@@ -1,0 +1,252 @@
+2025-11-28T13:16:14.156Z: API: GET /api/messages/[userId] STARTED
+2025-11-28T13:16:14.206Z: API: Session retrieved: YES
+2025-11-28T13:16:14.209Z: Requested userId: cmigl994e0000ztjmo693xvw5
+2025-11-28T13:16:14.210Z: Current user email: zkaymakcioglu2006@gmail.com
+2025-11-28T13:16:14.214Z: API: Current user found: YES
+2025-11-28T13:16:14.215Z: Current user ID: cmigmze160005ztjmalynif4y
+2025-11-28T13:16:14.221Z: Other user found: YES
+2025-11-28T13:16:14.222Z: API: Fetching messages...
+2025-11-28T13:16:14.229Z: API: Messages fetched, count: 4
+2025-11-28T13:16:14.230Z: API: Updating read status...
+2025-11-28T13:16:14.236Z: === ERROR in messages API ===
+2025-11-28T13:16:14.236Z: Error message: 
+Invalid `__TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$prisma$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["default"].message.updateMany()` invocation in
+C:\Users\huigf\Desktop\cnspocket\.next\dev\server\chunks\[root-of-the-server]__2f9503de._.js:364:146
+
+  361 logToFile(`API: Messages fetched, count: ${messages.length}`);
+  362 // Mark messages as read
+  363 logToFile('API: Updating read status...');
+→ 364 await __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$prisma$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["default"].message.updateMany({
+        where: {
+          senderId: "cmigl994e0000ztjmo693xvw5",
+          receiverId: "cmigmze160005ztjmalynif4y",
+          isRead: false
+        },
+        data: {
+          isRead: true,
+          ~~~~~~
+      ?   id?: String | StringFieldUpdateOperationsInput,
+      ?   content?: String | StringFieldUpdateOperationsInput,
+      ?   read?: Boolean | BoolFieldUpdateOperationsInput,
+      ?   createdAt?: DateTime | DateTimeFieldUpdateOperationsInput
+        }
+      })
+
+Unknown argument `isRead`. Did you mean `read`? Available options are marked with ?.
+2025-11-28T13:16:14.237Z: Error stack: PrismaClientValidationError: 
+Invalid `__TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$prisma$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["default"].message.updateMany()` invocation in
+C:\Users\huigf\Desktop\cnspocket\.next\dev\server\chunks\[root-of-the-server]__2f9503de._.js:364:146
+
+  361 logToFile(`API: Messages fetched, count: ${messages.length}`);
+  362 // Mark messages as read
+  363 logToFile('API: Updating read status...');
+→ 364 await __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$prisma$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["default"].message.updateMany({
+        where: {
+          senderId: "cmigl994e0000ztjmo693xvw5",
+          receiverId: "cmigmze160005ztjmalynif4y",
+          isRead: false
+        },
+        data: {
+          isRead: true,
+          ~~~~~~
+      ?   id?: String | StringFieldUpdateOperationsInput,
+      ?   content?: String | StringFieldUpdateOperationsInput,
+      ?   read?: Boolean | BoolFieldUpdateOperationsInput,
+      ?   createdAt?: DateTime | DateTimeFieldUpdateOperationsInput
+        }
+      })
+
+Unknown argument `isRead`. Did you mean `read`? Available options are marked with ?.
+    at wn (C:\Users\huigf\Desktop\cnspocket\node_modules\@prisma\client\runtime\library.js:29:1363)
+    at $n.handleRequestError (C:\Users\huigf\Desktop\cnspocket\node_modules\@prisma\client\runtime\library.js:121:6958)
+    at $n.handleAndLogRequestError (C:\Users\huigf\Desktop\cnspocket\node_modules\@prisma\client\runtime\library.js:121:6623)
+    at $n.request (C:\Users\huigf\Desktop\cnspocket\node_modules\@prisma\client\runtime\library.js:121:6307)
+    at async l (C:\Users\huigf\Desktop\cnspocket\node_modules\@prisma\client\runtime\library.js:130:9633)
+    at async GET (C:\Users\huigf\Desktop\cnspocket\.next\dev\server\chunks\[root-of-the-server]__2f9503de._.js:364:9)
+    at async AppRouteRouteModule.do (C:\Users\huigf\Desktop\cnspocket\node_modules\next\dist\compiled\next-server\app-route-turbo.runtime.dev.js:5:37789)
+    at async AppRouteRouteModule.handle (C:\Users\huigf\Desktop\cnspocket\node_modules\next\dist\compiled\next-server\app-route-turbo.runtime.dev.js:5:45045)
+    at async responseGenerator (C:\Users\huigf\Desktop\cnspocket\.next\dev\server\chunks\node_modules_next_a4e65984._.js:15485:38)
+    at async AppRouteRouteModule.handleResponse (C:\Users\huigf\Desktop\cnspocket\node_modules\next\dist\compiled\next-server\app-route-turbo.runtime.dev.js:1:187851)
+    at async handleResponse (C:\Users\huigf\Desktop\cnspocket\.next\dev\server\chunks\node_modules_next_a4e65984._.js:15547:32)
+    at async handler (C:\Users\huigf\Desktop\cnspocket\.next\dev\server\chunks\node_modules_next_a4e65984._.js:15600:13)
+    at async DevServer.renderToResponseWithComponentsImpl (C:\Users\huigf\Desktop\cnspocket\node_modules\next\dist\server\base-server.js:1413:9)
+    at async DevServer.renderPageComponent (C:\Users\huigf\Desktop\cnspocket\node_modules\next\dist\server\base-server.js:1465:24)
+    at async DevServer.renderToResponseImpl (C:\Users\huigf\Desktop\cnspocket\node_modules\next\dist\server\base-server.js:1515:32)
+    at async DevServer.pipeImpl (C:\Users\huigf\Desktop\cnspocket\node_modules\next\dist\server\base-server.js:1021:25)
+    at async NextNodeServer.handleCatchallRenderRequest (C:\Users\huigf\Desktop\cnspocket\node_modules\next\dist\server\next-server.js:394:17)
+    at async DevServer.handleRequestImpl (C:\Users\huigf\Desktop\cnspocket\node_modules\next\dist\server\base-server.js:912:17)
+    at async C:\Users\huigf\Desktop\cnspocket\node_modules\next\dist\server\dev\next-dev-server.js:382:20
+    at async Span.traceAsyncFn (C:\Users\huigf\Desktop\cnspocket\node_modules\next\dist\trace\trace.js:157:20)
+    at async DevServer.handleRequest (C:\Users\huigf\Desktop\cnspocket\node_modules\next\dist\server\dev\next-dev-server.js:378:24)
+    at async invokeRender (C:\Users\huigf\Desktop\cnspocket\node_modules\next\dist\server\lib\router-server.js:240:21)
+    at async handleRequest (C:\Users\huigf\Desktop\cnspocket\node_modules\next\dist\server\lib\router-server.js:436:24)
+    at async requestHandlerImpl (C:\Users\huigf\Desktop\cnspocket\node_modules\next\dist\server\lib\router-server.js:484:13)
+    at async Server.requestListener (C:\Users\huigf\Desktop\cnspocket\node_modules\next\dist\server\lib\start-server.js:226:13)
+2025-11-28T13:17:11.097Z: API: GET /api/messages/[userId] STARTED
+2025-11-28T13:17:11.111Z: API: Session retrieved: YES
+2025-11-28T13:17:11.112Z: Requested userId: cmigl994e0000ztjmo693xvw5
+2025-11-28T13:17:11.113Z: Current user email: zkaymakcioglu2006@gmail.com
+2025-11-28T13:17:11.116Z: API: Current user found: YES
+2025-11-28T13:17:11.117Z: Current user ID: cmigmze160005ztjmalynif4y
+2025-11-28T13:17:11.121Z: Other user found: YES
+2025-11-28T13:17:11.121Z: API: Fetching messages...
+2025-11-28T13:17:11.125Z: API: Messages fetched, count: 4
+2025-11-28T13:17:11.125Z: API: Updating read status...
+2025-11-28T13:17:11.132Z: === ERROR in messages API ===
+2025-11-28T13:17:11.133Z: Error message: 
+Invalid `__TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$prisma$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["default"].message.updateMany()` invocation in
+C:\Users\huigf\Desktop\cnspocket\.next\dev\server\chunks\[root-of-the-server]__2f9503de._.js:364:146
+
+  361 logToFile(`API: Messages fetched, count: ${messages.length}`);
+  362 // Mark messages as read
+  363 logToFile('API: Updating read status...');
+→ 364 await __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$prisma$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["default"].message.updateMany({
+        where: {
+          senderId: "cmigl994e0000ztjmo693xvw5",
+          receiverId: "cmigmze160005ztjmalynif4y",
+          isRead: false
+        },
+        data: {
+          isRead: true,
+          ~~~~~~
+      ?   id?: String | StringFieldUpdateOperationsInput,
+      ?   content?: String | StringFieldUpdateOperationsInput,
+      ?   read?: Boolean | BoolFieldUpdateOperationsInput,
+      ?   createdAt?: DateTime | DateTimeFieldUpdateOperationsInput
+        }
+      })
+
+Unknown argument `isRead`. Did you mean `read`? Available options are marked with ?.
+2025-11-28T13:17:11.133Z: Error stack: PrismaClientValidationError: 
+Invalid `__TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$prisma$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["default"].message.updateMany()` invocation in
+C:\Users\huigf\Desktop\cnspocket\.next\dev\server\chunks\[root-of-the-server]__2f9503de._.js:364:146
+
+  361 logToFile(`API: Messages fetched, count: ${messages.length}`);
+  362 // Mark messages as read
+  363 logToFile('API: Updating read status...');
+→ 364 await __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$prisma$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["default"].message.updateMany({
+        where: {
+          senderId: "cmigl994e0000ztjmo693xvw5",
+          receiverId: "cmigmze160005ztjmalynif4y",
+          isRead: false
+        },
+        data: {
+          isRead: true,
+          ~~~~~~
+      ?   id?: String | StringFieldUpdateOperationsInput,
+      ?   content?: String | StringFieldUpdateOperationsInput,
+      ?   read?: Boolean | BoolFieldUpdateOperationsInput,
+      ?   createdAt?: DateTime | DateTimeFieldUpdateOperationsInput
+        }
+      })
+
+Unknown argument `isRead`. Did you mean `read`? Available options are marked with ?.
+    at wn (C:\Users\huigf\Desktop\cnspocket\node_modules\@prisma\client\runtime\library.js:29:1363)
+    at $n.handleRequestError (C:\Users\huigf\Desktop\cnspocket\node_modules\@prisma\client\runtime\library.js:121:6958)
+    at $n.handleAndLogRequestError (C:\Users\huigf\Desktop\cnspocket\node_modules\@prisma\client\runtime\library.js:121:6623)
+    at $n.request (C:\Users\huigf\Desktop\cnspocket\node_modules\@prisma\client\runtime\library.js:121:6307)
+    at async l (C:\Users\huigf\Desktop\cnspocket\node_modules\@prisma\client\runtime\library.js:130:9633)
+    at async GET (C:\Users\huigf\Desktop\cnspocket\.next\dev\server\chunks\[root-of-the-server]__2f9503de._.js:364:9)
+    at async AppRouteRouteModule.do (C:\Users\huigf\Desktop\cnspocket\node_modules\next\dist\compiled\next-server\app-route-turbo.runtime.dev.js:5:37789)
+    at async AppRouteRouteModule.handle (C:\Users\huigf\Desktop\cnspocket\node_modules\next\dist\compiled\next-server\app-route-turbo.runtime.dev.js:5:45045)
+    at async responseGenerator (C:\Users\huigf\Desktop\cnspocket\.next\dev\server\chunks\node_modules_next_a4e65984._.js:15485:38)
+    at async AppRouteRouteModule.handleResponse (C:\Users\huigf\Desktop\cnspocket\node_modules\next\dist\compiled\next-server\app-route-turbo.runtime.dev.js:1:187851)
+    at async handleResponse (C:\Users\huigf\Desktop\cnspocket\.next\dev\server\chunks\node_modules_next_a4e65984._.js:15547:32)
+    at async handler (C:\Users\huigf\Desktop\cnspocket\.next\dev\server\chunks\node_modules_next_a4e65984._.js:15600:13)
+    at async DevServer.renderToResponseWithComponentsImpl (C:\Users\huigf\Desktop\cnspocket\node_modules\next\dist\server\base-server.js:1413:9)
+    at async DevServer.renderPageComponent (C:\Users\huigf\Desktop\cnspocket\node_modules\next\dist\server\base-server.js:1465:24)
+    at async DevServer.renderToResponseImpl (C:\Users\huigf\Desktop\cnspocket\node_modules\next\dist\server\base-server.js:1515:32)
+    at async DevServer.pipeImpl (C:\Users\huigf\Desktop\cnspocket\node_modules\next\dist\server\base-server.js:1021:25)
+    at async NextNodeServer.handleCatchallRenderRequest (C:\Users\huigf\Desktop\cnspocket\node_modules\next\dist\server\next-server.js:394:17)
+    at async DevServer.handleRequestImpl (C:\Users\huigf\Desktop\cnspocket\node_modules\next\dist\server\base-server.js:912:17)
+    at async C:\Users\huigf\Desktop\cnspocket\node_modules\next\dist\server\dev\next-dev-server.js:382:20
+    at async Span.traceAsyncFn (C:\Users\huigf\Desktop\cnspocket\node_modules\next\dist\trace\trace.js:157:20)
+    at async DevServer.handleRequest (C:\Users\huigf\Desktop\cnspocket\node_modules\next\dist\server\dev\next-dev-server.js:378:24)
+    at async invokeRender (C:\Users\huigf\Desktop\cnspocket\node_modules\next\dist\server\lib\router-server.js:240:21)
+    at async handleRequest (C:\Users\huigf\Desktop\cnspocket\node_modules\next\dist\server\lib\router-server.js:436:24)
+    at async requestHandlerImpl (C:\Users\huigf\Desktop\cnspocket\node_modules\next\dist\server\lib\router-server.js:484:13)
+    at async Server.requestListener (C:\Users\huigf\Desktop\cnspocket\node_modules\next\dist\server\lib\start-server.js:226:13)
+2025-11-28T13:17:11.160Z: API: GET /api/messages/[userId] STARTED
+2025-11-28T13:17:11.176Z: API: Session retrieved: YES
+2025-11-28T13:17:11.177Z: Requested userId: cmigl994e0000ztjmo693xvw5
+2025-11-28T13:17:11.177Z: Current user email: zkaymakcioglu2006@gmail.com
+2025-11-28T13:17:11.182Z: API: Current user found: YES
+2025-11-28T13:17:11.182Z: Current user ID: cmigmze160005ztjmalynif4y
+2025-11-28T13:17:11.187Z: Other user found: YES
+2025-11-28T13:17:11.188Z: API: Fetching messages...
+2025-11-28T13:17:11.192Z: API: Messages fetched, count: 4
+2025-11-28T13:17:11.193Z: API: Updating read status...
+2025-11-28T13:17:11.198Z: === ERROR in messages API ===
+2025-11-28T13:17:11.199Z: Error message: 
+Invalid `__TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$prisma$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["default"].message.updateMany()` invocation in
+C:\Users\huigf\Desktop\cnspocket\.next\dev\server\chunks\[root-of-the-server]__2f9503de._.js:364:146
+
+  361 logToFile(`API: Messages fetched, count: ${messages.length}`);
+  362 // Mark messages as read
+  363 logToFile('API: Updating read status...');
+→ 364 await __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$prisma$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["default"].message.updateMany({
+        where: {
+          senderId: "cmigl994e0000ztjmo693xvw5",
+          receiverId: "cmigmze160005ztjmalynif4y",
+          isRead: false
+        },
+        data: {
+          isRead: true,
+          ~~~~~~
+      ?   id?: String | StringFieldUpdateOperationsInput,
+      ?   content?: String | StringFieldUpdateOperationsInput,
+      ?   read?: Boolean | BoolFieldUpdateOperationsInput,
+      ?   createdAt?: DateTime | DateTimeFieldUpdateOperationsInput
+        }
+      })
+
+Unknown argument `isRead`. Did you mean `read`? Available options are marked with ?.
+2025-11-28T13:17:11.200Z: Error stack: PrismaClientValidationError: 
+Invalid `__TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$prisma$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["default"].message.updateMany()` invocation in
+C:\Users\huigf\Desktop\cnspocket\.next\dev\server\chunks\[root-of-the-server]__2f9503de._.js:364:146
+
+  361 logToFile(`API: Messages fetched, count: ${messages.length}`);
+  362 // Mark messages as read
+  363 logToFile('API: Updating read status...');
+→ 364 await __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$prisma$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["default"].message.updateMany({
+        where: {
+          senderId: "cmigl994e0000ztjmo693xvw5",
+          receiverId: "cmigmze160005ztjmalynif4y",
+          isRead: false
+        },
+        data: {
+          isRead: true,
+          ~~~~~~
+      ?   id?: String | StringFieldUpdateOperationsInput,
+      ?   content?: String | StringFieldUpdateOperationsInput,
+      ?   read?: Boolean | BoolFieldUpdateOperationsInput,
+      ?   createdAt?: DateTime | DateTimeFieldUpdateOperationsInput
+        }
+      })
+
+Unknown argument `isRead`. Did you mean `read`? Available options are marked with ?.
+    at wn (C:\Users\huigf\Desktop\cnspocket\node_modules\@prisma\client\runtime\library.js:29:1363)
+    at $n.handleRequestError (C:\Users\huigf\Desktop\cnspocket\node_modules\@prisma\client\runtime\library.js:121:6958)
+    at $n.handleAndLogRequestError (C:\Users\huigf\Desktop\cnspocket\node_modules\@prisma\client\runtime\library.js:121:6623)
+    at $n.request (C:\Users\huigf\Desktop\cnspocket\node_modules\@prisma\client\runtime\library.js:121:6307)
+    at async l (C:\Users\huigf\Desktop\cnspocket\node_modules\@prisma\client\runtime\library.js:130:9633)
+    at async GET (C:\Users\huigf\Desktop\cnspocket\.next\dev\server\chunks\[root-of-the-server]__2f9503de._.js:364:9)
+    at async AppRouteRouteModule.do (C:\Users\huigf\Desktop\cnspocket\node_modules\next\dist\compiled\next-server\app-route-turbo.runtime.dev.js:5:37789)
+    at async AppRouteRouteModule.handle (C:\Users\huigf\Desktop\cnspocket\node_modules\next\dist\compiled\next-server\app-route-turbo.runtime.dev.js:5:45045)
+    at async responseGenerator (C:\Users\huigf\Desktop\cnspocket\.next\dev\server\chunks\node_modules_next_a4e65984._.js:15485:38)
+    at async AppRouteRouteModule.handleResponse (C:\Users\huigf\Desktop\cnspocket\node_modules\next\dist\compiled\next-server\app-route-turbo.runtime.dev.js:1:187851)
+    at async handleResponse (C:\Users\huigf\Desktop\cnspocket\.next\dev\server\chunks\node_modules_next_a4e65984._.js:15547:32)
+    at async handler (C:\Users\huigf\Desktop\cnspocket\.next\dev\server\chunks\node_modules_next_a4e65984._.js:15600:13)
+    at async DevServer.renderToResponseWithComponentsImpl (C:\Users\huigf\Desktop\cnspocket\node_modules\next\dist\server\base-server.js:1413:9)
+    at async DevServer.renderPageComponent (C:\Users\huigf\Desktop\cnspocket\node_modules\next\dist\server\base-server.js:1465:24)
+    at async DevServer.renderToResponseImpl (C:\Users\huigf\Desktop\cnspocket\node_modules\next\dist\server\base-server.js:1515:32)
+    at async DevServer.pipeImpl (C:\Users\huigf\Desktop\cnspocket\node_modules\next\dist\server\base-server.js:1021:25)
+    at async NextNodeServer.handleCatchallRenderRequest (C:\Users\huigf\Desktop\cnspocket\node_modules\next\dist\server\next-server.js:394:17)
+    at async DevServer.handleRequestImpl (C:\Users\huigf\Desktop\cnspocket\node_modules\next\dist\server\base-server.js:912:17)
+    at async C:\Users\huigf\Desktop\cnspocket\node_modules\next\dist\server\dev\next-dev-server.js:382:20
+    at async Span.traceAsyncFn (C:\Users\huigf\Desktop\cnspocket\node_modules\next\dist\trace\trace.js:157:20)
+    at async DevServer.handleRequest (C:\Users\huigf\Desktop\cnspocket\node_modules\next\dist\server\dev\next-dev-server.js:378:24)
+    at async invokeRender (C:\Users\huigf\Desktop\cnspocket\node_modules\next\dist\server\lib\router-server.js:240:21)
+    at async handleRequest (C:\Users\huigf\Desktop\cnspocket\node_modules\next\dist\server\lib\router-server.js:436:24)
+    at async requestHandlerImpl (C:\Users\huigf\Desktop\cnspocket\node_modules\next\dist\server\lib\router-server.js:484:13)
+    at async Server.requestListener (C:\Users\huigf\Desktop\cnspocket\node_modules\next\dist\server\lib\start-server.js:226:13)

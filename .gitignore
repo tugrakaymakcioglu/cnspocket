@@ -1,0 +1,28 @@
+# Dependencies
+node_modules
+
+# Environment variables - Keep out of version control
+.env
+.env*.local
+.env.production
+
+# Next.js build output
+.next
+out
+build
+
+# Prisma
+/app/generated/prisma
+
+# Development files
+.DS_Store
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# IDE
+.vscode
+.idea
+*.swp
+*.swo
