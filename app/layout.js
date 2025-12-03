@@ -4,6 +4,7 @@ import Providers from '@/components/Providers';
 import NotificationBell from '@/components/NotificationBell';
 import Calendar from '@/components/Calendar';
 import GoogleAnalytics from '@/components/GoogleAnalytics';
+import SplashScreen from '@/components/SplashScreen';
 import './globals.css'
 import { Inter, Pacifico } from 'next/font/google'
 
@@ -70,21 +71,23 @@ export default function RootLayout({ children }) {
             </head>
             <body suppressHydrationWarning={true} className={`${inter.className} ${pacifico.variable}`}>
                 <Providers>
-                    <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
-                        <Navbar />
-                        <main style={{
-                            flex: 1,
-                            padding: '2rem',
-                            maxWidth: '1200px',
-                            margin: '0 auto',
-                            width: '100%'
-                        }} className="responsive-main">
-                            {children}
-                        </main>
-                        <Footer />
-                    </div>
-                    <NotificationBell />
-                    <Calendar />
+                    <SplashScreen>
+                        <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
+                            <Navbar />
+                            <main style={{
+                                flex: 1,
+                                padding: '2rem',
+                                maxWidth: '1200px',
+                                margin: '0 auto',
+                                width: '100%'
+                            }} className="responsive-main">
+                                {children}
+                            </main>
+                            <Footer />
+                        </div>
+                        <NotificationBell />
+                        <Calendar />
+                    </SplashScreen>
                 </Providers>
             </body>
         </html>
