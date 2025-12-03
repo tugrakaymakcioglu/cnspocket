@@ -85,6 +85,7 @@ export async function GET(req) {
         return NextResponse.json({
             trending,
             trendingPosts: trendingPosts.map(p => ({
+                id: p.id,
                 title: p.title,
                 tags: p.tags,
                 views: p.viewCount

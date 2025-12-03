@@ -511,19 +511,33 @@ function SearchPageContent() {
                             <h2 style={{ fontSize: '1.3rem', marginBottom: '1rem', color: 'var(--text)' }}>Trend Gönderiler</h2>
                             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
                                 {suggestions.trendingPosts.map((post, idx) => (
-                                    <div key={idx} style={{
+                                    <Link key={idx} href={`/forum/${post.id}`} style={{
+                                        display: 'block',
                                         padding: '1rem',
                                         backgroundColor: 'var(--secondary)',
                                         borderRadius: '8px',
-                                        border: '1px solid var(--border)'
-                                    }}>
+                                        border: '1px solid var(--border)',
+                                        textDecoration: 'none',
+                                        cursor: 'pointer',
+                                        transition: 'all 0.2s ease'
+                                    }}
+                                        onMouseEnter={(e) => {
+                                            e.currentTarget.style.borderColor = 'var(--primary)';
+                                            e.currentTarget.style.transform = 'translateY(-2px)';
+                                            e.currentTarget.style.boxShadow = '0 4px 8px rgba(0,0,0,0.1)';
+                                        }}
+                                        onMouseLeave={(e) => {
+                                            e.currentTarget.style.borderColor = 'var(--border)';
+                                            e.currentTarget.style.transform = 'translateY(0)';
+                                            e.currentTarget.style.boxShadow = 'none';
+                                        }}>
                                         <div style={{ fontSize: '1rem', color: 'var(--text)', marginBottom: '0.25rem', fontWeight: '500' }}>
                                             {post.title}
                                         </div>
                                         <div style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
                                             👁️ {post.views} görüntülenme
                                         </div>
-                                    </div>
+                                    </Link>
                                 ))}
                             </div>
                         </div>
