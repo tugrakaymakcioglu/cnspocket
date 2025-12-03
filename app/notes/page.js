@@ -386,7 +386,7 @@ export default function Notes() {
                                                             <a
                                                                 key={index}
                                                                 href={url}
-                                                                download
+                                                                download={`Notvarmi.com_${filename}`}
                                                                 onClick={(e) => e.stopPropagation()}
                                                                 style={{
                                                                     display: 'flex',
