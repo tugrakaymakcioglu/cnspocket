@@ -21,9 +21,7 @@ export async function POST(req) {
         });
 
         if (!user) {
-            // For security, don't reveal if user exists or not
-            // Just return success
-            return NextResponse.json({ success: true });
+            return NextResponse.json({ error: 'Bu e-posta adresi sistemde kayıtlı değil' }, { status: 404 });
         }
 
         // Generate 6-digit code
