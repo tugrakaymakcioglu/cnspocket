@@ -4,11 +4,13 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Card from '@/components/Card';
 import Link from 'next/link';
+import { useSession } from 'next-auth/react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import FileBadge from '@/components/FileBadge';
 
 export default function Forum() {
     const router = useRouter();
+    const { data: session } = useSession();
     const [questions, setQuestions] = useState([]);
     const [searchTerm, setSearchTerm] = useState('');
     const [sortBy, setSortBy] = useState('newest');
@@ -98,38 +100,40 @@ export default function Forum() {
                     <h1 style={{ fontSize: isMobile ? '2rem' : '2.5rem', marginBottom: '0.5rem', color: 'var(--text)' }}>{t.forum.title}</h1>
                     <p style={{ color: 'var(--text-secondary)', fontSize: '1.1rem' }}>{t.forum.subtitle}</p>
                 </div>
-                <Link href="/forum/create" style={{
-                    width: isMobile ? '100%' : 'auto',
-                    justifyContent: 'center',
-                    padding: '1rem 1.5rem',
-                    background: 'linear-gradient(135deg, #ec4899 0%, #db2777 50%, #be185d 100%)',
-                    color: 'white',
-                    textDecoration: 'none',
-                    borderRadius: '12px',
-                    fontWeight: 'bold',
-                    fontSize: '1rem',
-                    boxShadow: '0 4px 14px rgba(236, 72, 153, 0.4)',
-                    transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    gap: '0.5rem',
-                    whiteSpace: 'nowrap',
-                    position: 'relative',
-                    overflow: 'hidden'
-                }}
-                    onMouseEnter={(e) => {
-                        e.currentTarget.style.transform = 'translateY(-2px) scale(1.02)';
-                        e.currentTarget.style.boxShadow = '0 8px 25px rgba(236, 72, 153, 0.5)';
-                        e.currentTarget.style.background = 'linear-gradient(135deg, #db2777 0%, #ec4899 50%, #f472b6 100%)';
+                {session && (
+                    <Link href="/forum/create" style={{
+                        width: isMobile ? '100%' : 'auto',
+                        justifyContent: 'center',
+                        padding: '1rem 1.5rem',
+                        background: 'linear-gradient(135deg, #ec4899 0%, #db2777 50%, #be185d 100%)',
+                        color: 'white',
+                        textDecoration: 'none',
+                        borderRadius: '12px',
+                        fontWeight: 'bold',
+                        fontSize: '1rem',
+                        boxShadow: '0 4px 14px rgba(236, 72, 153, 0.4)',
+                        transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '0.5rem',
+                        whiteSpace: 'nowrap',
+                        position: 'relative',
+                        overflow: 'hidden'
                     }}
-                    onMouseLeave={(e) => {
-                        e.currentTarget.style.transform = 'translateY(0) scale(1)';
-                        e.currentTarget.style.boxShadow = '0 4px 14px rgba(236, 72, 153, 0.4)';
-                        e.currentTarget.style.background = 'linear-gradient(135deg, #ec4899 0%, #db2777 50%, #be185d 100%)';
-                    }}>
-                    <span style={{ fontSize: '1.2rem', display: 'flex', alignItems: 'center' }}>💬</span>
-                    {t.forum.newPost}
-                </Link>
+                        onMouseEnter={(e) => {
+                            e.currentTarget.style.transform = 'translateY(-2px) scale(1.02)';
+                            e.currentTarget.style.boxShadow = '0 8px 25px rgba(236, 72, 153, 0.5)';
+                            e.currentTarget.style.background = 'linear-gradient(135deg, #db2777 0%, #ec4899 50%, #f472b6 100%)';
+                        }}
+                        onMouseLeave={(e) => {
+                            e.currentTarget.style.transform = 'translateY(0) scale(1)';
+                            e.currentTarget.style.boxShadow = '0 4px 14px rgba(236, 72, 153, 0.4)';
+                            e.currentTarget.style.background = 'linear-gradient(135deg, #ec4899 0%, #db2777 50%, #be185d 100%)';
+                        }}>
+                        <span style={{ fontSize: '1.2rem', display: 'flex', alignItems: 'center' }}>💬</span>
+                        {t.forum.newPost}
+                    </Link>
+                )}
             </div>
 
             {/* Search and Filter */}

@@ -76,30 +76,56 @@ export default function Hero() {
                             Foruma Git
                         </Link>
                     ) : (
-                        <Link href="/register" style={{
-                            padding: '1.2rem 2.5rem',
-                            background: 'var(--primary-gradient)',
-                            color: 'white',
-                            borderRadius: '50px',
-                            textDecoration: 'none',
-                            fontWeight: 'bold',
-                            fontSize: '1.1rem',
-                            boxShadow: '0 10px 25px rgba(225, 48, 108, 0.3)',
-                            transition: 'transform 0.2s ease, box-shadow 0.2s ease',
-                            display: 'inline-block',
-                            textAlign: 'center',
-                            cursor: 'pointer'
-                        }}
-                            onMouseEnter={(e) => {
-                                e.currentTarget.style.transform = 'translateY(-2px)';
-                                e.currentTarget.style.boxShadow = '0 15px 30px rgba(225, 48, 108, 0.4)';
+                        <>
+                            <Link href="/register" style={{
+                                padding: '1.2rem 2.5rem',
+                                background: 'var(--primary-gradient)',
+                                color: 'white',
+                                borderRadius: '50px',
+                                textDecoration: 'none',
+                                fontWeight: 'bold',
+                                fontSize: '1.1rem',
+                                boxShadow: '0 10px 25px rgba(225, 48, 108, 0.3)',
+                                transition: 'transform 0.2s ease, box-shadow 0.2s ease',
+                                display: 'inline-block',
+                                textAlign: 'center',
+                                cursor: 'pointer'
                             }}
-                            onMouseLeave={(e) => {
-                                e.currentTarget.style.transform = 'translateY(0)';
-                                e.currentTarget.style.boxShadow = '0 10px 25px rgba(225, 48, 108, 0.3)';
-                            }}>
-                            Hemen Başla
-                        </Link>
+                                onMouseEnter={(e) => {
+                                    e.currentTarget.style.transform = 'translateY(-2px)';
+                                    e.currentTarget.style.boxShadow = '0 15px 30px rgba(225, 48, 108, 0.4)';
+                                }}
+                                onMouseLeave={(e) => {
+                                    e.currentTarget.style.transform = 'translateY(0)';
+                                    e.currentTarget.style.boxShadow = '0 10px 25px rgba(225, 48, 108, 0.3)';
+                                }}>
+                                Hemen Başla
+                            </Link>
+                            <Link href="/forum" style={{
+                                padding: '1.2rem 2.5rem',
+                                backgroundColor: 'transparent',
+                                color: 'var(--text)',
+                                border: '2px solid var(--border)',
+                                borderRadius: '50px',
+                                textDecoration: 'none',
+                                fontWeight: 'bold',
+                                fontSize: '1.1rem',
+                                transition: 'all 0.2s ease',
+                                display: 'inline-block',
+                                textAlign: 'center',
+                                cursor: 'pointer'
+                            }}
+                                onMouseEnter={(e) => {
+                                    e.currentTarget.style.borderColor = 'var(--text)';
+                                    e.currentTarget.style.backgroundColor = 'var(--secondary)';
+                                }}
+                                onMouseLeave={(e) => {
+                                    e.currentTarget.style.borderColor = 'var(--border)';
+                                    e.currentTarget.style.backgroundColor = 'transparent';
+                                }}>
+                                Foruma Git
+                            </Link>
+                        </>
                     )}
 
                     {status === 'authenticated' && (
