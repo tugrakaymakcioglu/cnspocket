@@ -414,32 +414,62 @@ export default function SettingsPage() {
         { id: 'account', icon: '⚙️', label: 'Hesap' },
     ];
 
+    const [isMobile, setIsMobile] = useState(false);
+
+    useEffect(() => {
+        const checkMobile = () => {
+            setIsMobile(window.innerWidth <= 768);
+        };
+        checkMobile();
+        window.addEventListener('resize', checkMobile);
+        return () => window.removeEventListener('resize', checkMobile);
+    }, []);
+
     if (loading) {
         return <LoadingScreen />;
     }
 
     return (
-        <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '2rem 1rem' }}>
+        <div style={{ maxWidth: '1200px', margin: '0 auto', padding: isMobile ? '1rem' : '2rem 1rem' }}>
             <h1 style={{ marginBottom: '2rem', color: 'var(--text)', fontSize: '2rem' }}>Ayarlar</h1>
 
-            <div style={{ display: 'grid', gridTemplateColumns: '250px 1fr', gap: '2rem', alignItems: 'start' }}>
+            <div style={{
+                display: 'grid',
+                gridTemplateColumns: isMobile ? '1fr' : '250px 1fr',
+                gap: '2rem',
+                alignItems: 'start'
+            }}>
                 {/* Sidebar */}
                 <div style={{
                     background: 'var(--secondary)',
                     borderRadius: '16px',
                     padding: '1rem',
                     border: '1px solid var(--border)',
-                    position: 'sticky',
-                    top: '2rem'
+                    position: isMobile ? 'static' : 'sticky',
+                    top: '2rem',
+                    display: isMobile ? 'flex' : 'block',
+                    overflowX: isMobile ? 'auto' : 'visible',
+                    gap: isMobile ? '0.5rem' : '0',
+                    scrollbarWidth: 'none', // Hide scrollbar for Firefox
+                    msOverflowStyle: 'none' // Hide scrollbar for IE/Edge
                 }}>
+                    {/* Hide scrollbar for Chrome/Safari/Opera */}
+                    {isMobile && (
+                        <style jsx>{`
+                            div::-webkit-scrollbar {
+                                display: none;
+                            }
+                        `}</style>
+                    )}
+
                     {tabs.map(tab => (
                         <button
                             key={tab.id}
                             onClick={() => setActiveTab(tab.id)}
                             style={{
-                                width: '100%',
+                                width: isMobile ? 'auto' : '100%',
                                 padding: '0.9rem 1.2rem',
-                                marginBottom: '0.5rem',
+                                marginBottom: isMobile ? '0' : '0.5rem',
                                 background: activeTab === tab.id ? 'var(--accent-purple)' : 'transparent',
                                 color: activeTab === tab.id ? 'white' : 'var(--text)',
                                 border: 'none',
@@ -451,7 +481,9 @@ export default function SettingsPage() {
                                 alignItems: 'center',
                                 gap: '0.75rem',
                                 transition: 'all 0.2s',
-                                textAlign: 'left'
+                                textAlign: isMobile ? 'center' : 'left',
+                                whiteSpace: isMobile ? 'nowrap' : 'normal',
+                                flexShrink: 0
                             }}
                             onMouseEnter={(e) => {
                                 if (activeTab !== tab.id) {
@@ -474,7 +506,7 @@ export default function SettingsPage() {
                 <div style={{
                     background: 'var(--secondary)',
                     borderRadius: '16px',
-                    padding: '2rem',
+                    padding: isMobile ? '1.5rem' : '2rem',
                     border: '1px solid var(--border)',
                     minHeight: '500px'
                 }}>

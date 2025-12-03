@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useSession } from 'next-auth/react';
 
-export default function ProductivityMenu() {
+export default function ProductivityMenu({ isMobile, onOpen }) {
     const { data: session } = useSession();
     const [isOpen, setIsOpen] = useState(false);
     const [tasks, setTasks] = useState([]);
@@ -140,6 +140,14 @@ export default function ProductivityMenu() {
         }
     };
 
+    const handleToggle = () => {
+        const newState = !isOpen;
+        setIsOpen(newState);
+        if (newState && onOpen) {
+            onOpen();
+        }
+    };
+
     const incompleteTasks = tasks.filter(t => !t.completed && (filter === 'ALL' || t.category === filter));
     const completedTasks = tasks.filter(t => t.completed && (filter === 'ALL' || t.category === filter));
 
@@ -168,8 +176,23 @@ export default function ProductivityMenu() {
         <>
             {/* Trigger Button */}
             <button
-                onClick={() => setIsOpen(!isOpen)}
-                style={{
+                onClick={handleToggle}
+                style={isMobile ? {
+                    background: 'none',
+                    border: 'none',
+                    cursor: 'pointer',
+                    color: 'var(--text)',
+                    fontSize: '1rem',
+                    fontWeight: '600',
+                    width: '100%',
+                    textAlign: 'left',
+                    padding: '1rem',
+                    borderRadius: '8px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.3rem',
+                    transition: 'background-color 0.2s ease'
+                } : {
                     background: 'none',
                     border: 'none',
                     color: 'var(--text)',
@@ -184,22 +207,30 @@ export default function ProductivityMenu() {
                     position: 'relative'
                 }}
                 onMouseEnter={(e) => {
-                    e.currentTarget.style.color = 'var(--primary)';
-                    const underline = e.currentTarget.querySelector('.underline');
-                    if (underline) underline.style.width = '100%';
+                    if (isMobile) {
+                        e.currentTarget.style.backgroundColor = 'var(--secondary)';
+                    } else {
+                        e.currentTarget.style.color = 'var(--primary)';
+                        const underline = e.currentTarget.querySelector('.underline');
+                        if (underline) underline.style.width = '100%';
+                    }
                 }}
                 onMouseLeave={(e) => {
-                    e.currentTarget.style.color = 'var(--text)';
-                    const underline = e.currentTarget.querySelector('.underline');
-                    if (underline) underline.style.width = '0';
+                    if (isMobile) {
+                        e.currentTarget.style.backgroundColor = 'transparent';
+                    } else {
+                        e.currentTarget.style.color = 'var(--text)';
+                        const underline = e.currentTarget.querySelector('.underline');
+                        if (underline) underline.style.width = '0';
+                    }
                 }}
             >
-                Hatırlatıcı
+                {isMobile ? '✅ Hatırlatıcı' : 'Hatırlatıcı'}
                 {(incompleteTasks.length > 0 || notifications.count > 0) && (
                     <span style={{
-                        position: 'absolute',
-                        top: '-8px',
-                        right: '-8px',
+                        position: isMobile ? 'static' : 'absolute',
+                        top: isMobile ? 'auto' : '-8px',
+                        right: isMobile ? 'auto' : '-8px',
                         background: '#ff4444',
                         color: 'white',
                         borderRadius: '50%',
@@ -211,26 +242,29 @@ export default function ProductivityMenu() {
                         justifyContent: 'center',
                         fontWeight: 'bold',
                         padding: '0 4px',
-                        border: '2px solid var(--background)'
+                        border: '2px solid var(--background)',
+                        marginLeft: isMobile ? 'auto' : '0'
                     }}>
                         {notifications.count || incompleteTasks.length}
                     </span>
                 )}
-                <span
-                    className="underline"
-                    style={{
-                        content: '',
-                        position: 'absolute',
-                        width: '0',
-                        height: '2px',
-                        bottom: '0',
-                        left: '50%',
-                        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                        transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-                        transform: 'translateX(-50%)',
-                        borderRadius: '2px'
-                    }}
-                />
+                {!isMobile && (
+                    <span
+                        className="underline"
+                        style={{
+                            content: '',
+                            position: 'absolute',
+                            width: '0',
+                            height: '2px',
+                            bottom: '0',
+                            left: '50%',
+                            background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                            transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                            transform: 'translateX(-50%)',
+                            borderRadius: '2px'
+                        }}
+                    />
+                )}
             </button>
 
             {/* Deadline Alert Modal */}
@@ -263,6 +297,7 @@ export default function ProductivityMenu() {
                         boxShadow: '0 20px 60px rgba(0,0,0,0.3)',
                         animation: 'slideIn 0.3s'
                     }}>
+                        {/* ... (keep deadline alert content) ... */}
                         <div style={{ fontSize: '4rem', marginBottom: '1rem' }}>⏰</div>
                         <h2 style={{ color: '#FF416C', marginBottom: '0.5rem', fontSize: '1.5rem' }}>
                             Deadline Geldi!
@@ -320,7 +355,7 @@ export default function ProductivityMenu() {
                             bottom: 0,
                             background: 'rgba(0, 0, 0, 0.5)',
                             backdropFilter: 'blur(4px)',
-                            zIndex: 999
+                            zIndex: 1999
                         }}
                     />
 
@@ -335,7 +370,7 @@ export default function ProductivityMenu() {
                         background: 'var(--background)',
                         borderRadius: '24px',
                         boxShadow: '0 25px 50px rgba(0,0,0,0.25)',
-                        zIndex: 1000,
+                        zIndex: 2000,
                         overflow: 'hidden',
                         display: 'flex',
                         flexDirection: 'column'

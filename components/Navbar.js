@@ -240,6 +240,14 @@ export default function Navbar() {
                                 </Link>
                             </li>
                             <li>
+                                <Link href="/settings" onClick={closeMobileMenu}>
+                                    ⚙️ Ayarlar
+                                </Link>
+                            </li>
+                            <li>
+                                <ProductivityMenu isMobile={true} onOpen={closeMobileMenu} />
+                            </li>
+                            <li>
                                 <button onClick={() => { signOut(); closeMobileMenu(); }} style={{
                                     background: 'none',
                                     border: 'none',
