@@ -54,7 +54,7 @@ export const metadata = {
         ],
     },
     verification: {
-        google: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION || '',
+        google: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION || '92aEaptUlxU0Z12qEr28DXdP2LXD9iSM9rUdp08kUNo',
     },
     openGraph: {
         type: 'website',

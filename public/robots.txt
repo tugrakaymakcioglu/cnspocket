@@ -1,4 +1,4 @@
-# https://www.notvarmı.com/robots.txt
+# https://www.notvarmi.com/robots.txt
 
 User-agent: *
 Allow: /
@@ -8,4 +8,4 @@ Disallow: /messages/
 Disallow: /settings/
 
 # Sitemap
-Sitemap: https://www.notvarmı.com/sitemap.xml
+Sitemap: https://www.notvarmi.com/sitemap.xml
