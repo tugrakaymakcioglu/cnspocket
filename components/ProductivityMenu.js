@@ -176,328 +176,104 @@ export default function ProductivityMenu({ isMobile, onOpen }) {
         <>
             {/* Trigger Button */}
             <button
+                className={`trigger-btn ${isMobile ? 'mobile' : 'desktop'}`}
                 onClick={handleToggle}
-                style={isMobile ? {
-                    background: 'none',
-                    border: 'none',
-                    cursor: 'pointer',
-                    color: 'var(--text)',
-                    fontSize: '1rem',
-                    fontWeight: '600',
-                    width: '100%',
-                    textAlign: 'left',
-                    padding: '1rem',
-                    borderRadius: '8px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '0.3rem',
-                    transition: 'background-color 0.2s ease'
-                } : {
-                    background: 'none',
-                    border: 'none',
-                    color: 'var(--text)',
-                    padding: '0.5rem 0',
-                    cursor: 'pointer',
-                    fontSize: '1rem',
-                    fontWeight: '600',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '0.3rem',
-                    transition: 'color 0.3s ease',
-                    position: 'relative'
-                }}
-                onMouseEnter={(e) => {
-                    if (isMobile) {
-                        e.currentTarget.style.backgroundColor = 'var(--secondary)';
-                    } else {
-                        e.currentTarget.style.color = 'var(--primary)';
-                        const underline = e.currentTarget.querySelector('.underline');
-                        if (underline) underline.style.width = '100%';
-                    }
-                }}
-                onMouseLeave={(e) => {
-                    if (isMobile) {
-                        e.currentTarget.style.backgroundColor = 'transparent';
-                    } else {
-                        e.currentTarget.style.color = 'var(--text)';
-                        const underline = e.currentTarget.querySelector('.underline');
-                        if (underline) underline.style.width = '0';
-                    }
-                }}
             >
-                {isMobile ? '✅ Hatırlatıcı' : 'Hatırlatıcı'}
+                {isMobile ? '✅ Hatırlatıcı' : '✅ Hatırlatıcı'}
                 {(incompleteTasks.length > 0 || notifications.count > 0) && (
-                    <span style={{
-                        position: isMobile ? 'static' : 'absolute',
-                        top: isMobile ? 'auto' : '-8px',
-                        right: isMobile ? 'auto' : '-8px',
-                        background: '#ff4444',
-                        color: 'white',
-                        borderRadius: '50%',
-                        minWidth: '18px',
-                        height: '18px',
-                        fontSize: '10px',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        fontWeight: 'bold',
-                        padding: '0 4px',
-                        border: '2px solid var(--background)',
-                        marginLeft: isMobile ? 'auto' : '0'
-                    }}>
+                    <span className="badge">
                         {notifications.count || incompleteTasks.length}
                     </span>
                 )}
-                {!isMobile && (
-                    <span
-                        className="underline"
-                        style={{
-                            content: '',
-                            position: 'absolute',
-                            width: '0',
-                            height: '2px',
-                            bottom: '0',
-                            left: '50%',
-                            background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                            transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-                            transform: 'translateX(-50%)',
-                            borderRadius: '2px'
-                        }}
-                    />
-                )}
+                {!isMobile && <span className="underline" />}
             </button>
 
             {/* Deadline Alert Modal */}
             {deadlineAlert && (
-                <>
-                    <div
-                        onClick={() => setDeadlineAlert(null)}
-                        style={{
-                            position: 'fixed',
-                            top: 0,
-                            left: 0,
-                            right: 0,
-                            bottom: 0,
-                            background: 'rgba(0, 0, 0, 0.7)',
-                            zIndex: 2000,
-                            animation: 'fadeIn 0.3s'
-                        }}
-                    />
-                    <div style={{
-                        position: 'fixed',
-                        top: '50%',
-                        left: '50%',
-                        transform: 'translate(-50%, -50%)',
-                        background: 'white',
-                        borderRadius: '20px',
-                        padding: '2rem',
-                        zIndex: 2001,
-                        maxWidth: '400px',
-                        textAlign: 'center',
-                        boxShadow: '0 20px 60px rgba(0,0,0,0.3)',
-                        animation: 'slideIn 0.3s'
-                    }}>
-                        {/* ... (keep deadline alert content) ... */}
-                        <div style={{ fontSize: '4rem', marginBottom: '1rem' }}>⏰</div>
-                        <h2 style={{ color: '#FF416C', marginBottom: '0.5rem', fontSize: '1.5rem' }}>
-                            Deadline Geldi!
-                        </h2>
-                        <p style={{ color: '#333', fontSize: '1.2rem', fontWeight: '600', marginBottom: '1rem' }}>
-                            {deadlineAlert.title}
-                        </p>
-                        <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center' }}>
+                <div className="alert-overlay">
+                    <div className="alert-modal">
+                        <div className="alert-icon">⏰</div>
+                        <h2 className="alert-title">Deadline Geldi!</h2>
+                        <p className="alert-message">{deadlineAlert.title}</p>
+                        <div className="alert-actions">
                             <button
+                                className="btn-primary"
                                 onClick={() => {
                                     updateTask(deadlineAlert.id, { completed: true });
                                     setDeadlineAlert(null);
-                                }}
-                                style={{
-                                    padding: '0.8rem 1.5rem',
-                                    background: 'linear-gradient(135deg, #11998e, #38ef7d)',
-                                    color: 'white',
-                                    border: 'none',
-                                    borderRadius: '12px',
-                                    cursor: 'pointer',
-                                    fontWeight: '700'
                                 }}
                             >
                                 ✅ Tamamla
                             </button>
                             <button
+                                className="btn-secondary"
                                 onClick={() => setDeadlineAlert(null)}
-                                style={{
-                                    padding: '0.8rem 1.5rem',
-                                    background: 'var(--secondary)',
-                                    color: 'var(--text)',
-                                    border: '2px solid var(--border)',
-                                    borderRadius: '12px',
-                                    cursor: 'pointer',
-                                    fontWeight: '700'
-                                }}
                             >
                                 👁️ Tamam
                             </button>
                         </div>
                     </div>
-                </>
+                </div>
             )}
 
             {/* Main Modal */}
             {isOpen && (
                 <>
-                    <div
-                        onClick={() => setIsOpen(false)}
-                        style={{
-                            position: 'fixed',
-                            top: 0,
-                            left: 0,
-                            right: 0,
-                            bottom: 0,
-                            background: 'rgba(0, 0, 0, 0.5)',
-                            backdropFilter: 'blur(4px)',
-                            zIndex: 1999
-                        }}
-                    />
-
-                    <div style={{
-                        position: 'fixed',
-                        top: '50%',
-                        left: '50%',
-                        transform: 'translate(-50%, -50%)',
-                        width: '90%',
-                        maxWidth: '700px',
-                        maxHeight: '90vh',
-                        background: 'var(--background)',
-                        borderRadius: '24px',
-                        boxShadow: '0 25px 50px rgba(0,0,0,0.25)',
-                        zIndex: 2000,
-                        overflow: 'hidden',
-                        display: 'flex',
-                        flexDirection: 'column'
-                    }}>
+                    <div className="modal-overlay" onClick={() => setIsOpen(false)} />
+                    <div className="modal-container">
                         {/* Header */}
-                        <div style={{
-                            background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                            padding: '1.5rem',
-                            color: 'white'
-                        }}>
-                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                <h2 style={{ margin: 0, fontSize: '1.5rem', fontWeight: '800' }}>
-                                    🔔 Hatırlatıcılarım ({incompleteTasks.length})
-                                </h2>
-                                <button
-                                    onClick={() => setIsOpen(false)}
-                                    style={{
-                                        background: 'rgba(255,255,255,0.2)',
-                                        border: 'none',
-                                        color: 'white',
-                                        width: '32px',
-                                        height: '32px',
-                                        borderRadius: '50%',
-                                        cursor: 'pointer',
-                                        fontSize: '1.2rem',
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        justifyContent: 'center'
-                                    }}
-                                >
-                                    ✕
-                                </button>
-                            </div>
+                        <div className="modal-header">
+                            <h2>🔔 Hatırlatıcılarım ({incompleteTasks.length})</h2>
+                            <button className="close-btn" onClick={() => setIsOpen(false)}>✕</button>
                         </div>
 
                         {saveMessage && (
-                            <div style={{
-                                padding: '0.8rem',
-                                background: saveMessage.includes('❌') ? 'linear-gradient(135deg, #FF416C, #FF4B2B)' : 'linear-gradient(135deg, #11998e, #38ef7d)',
-                                color: 'white',
-                                textAlign: 'center',
-                                fontWeight: '600',
-                                fontSize: '0.9rem'
-                            }}>
+                            <div className={`status-message ${saveMessage.includes('❌') ? 'error' : 'success'}`}>
                                 {saveMessage}
                             </div>
                         )}
 
-                        <div style={{ flex: 1, overflowY: 'auto', padding: '1.5rem' }}>
+                        <div className="modal-content">
                             {/* Deadline Notifications */}
                             {(notifications.overdue.length > 0 || notifications.approaching.length > 0) && (
-                                <div style={{ marginBottom: '1.5rem', padding: '1rem', background: '#FFF3CD', borderRadius: '12px', border: '2px solid #FFD700' }}>
-                                    <h4 style={{ margin: '0 0 0.5rem 0', fontSize: '1rem', fontWeight: '700', color: '#856404' }}>
-                                        ⚠️ Deadline Uyarıları
-                                    </h4>
+                                <div className="notification-box">
+                                    <h4>⚠️ Deadline Uyarıları</h4>
                                     {notifications.overdue.length > 0 && (
-                                        <p style={{ margin: '0.5rem 0', color: '#721c24', fontSize: '0.9rem' }}>
-                                            🔴 {notifications.overdue.length} gecikmiş görev
-                                        </p>
+                                        <p className="text-danger">🔴 {notifications.overdue.length} gecikmiş görev</p>
                                     )}
                                     {notifications.approaching.length > 0 && (
-                                        <p style={{ margin: '0.5rem 0', color: '#856404', fontSize: '0.9rem' }}>
-                                            🟡 {notifications.approaching.length} görev 24 saat içinde
-                                        </p>
+                                        <p className="text-warning">🟡 {notifications.approaching.length} görev 24 saat içinde</p>
                                     )}
                                 </div>
                             )}
 
                             {/* Add Task Form */}
-                            <div style={{
-                                background: 'var(--secondary)',
-                                padding: '1.5rem',
-                                borderRadius: '16px',
-                                marginBottom: '1.5rem',
-                                border: '2px dashed var(--border)'
-                            }}>
-                                <h3 style={{ margin: '0 0 1rem 0', fontSize: '1.1rem', fontWeight: '700', color: 'var(--text)' }}>
-                                    ➕ Yeni Hatırlatıcı
-                                </h3>
-                                <input
-                                    type="text"
-                                    value={newTask.title}
-                                    onChange={(e) => setNewTask({ ...newTask, title: e.target.value })}
-                                    placeholder="Hatırlatıcı başlığı..."
-                                    onKeyPress={(e) => e.key === 'Enter' && addTask()}
-                                    style={{
-                                        width: '100%',
-                                        padding: '1rem',
-                                        marginBottom: '0.8rem',
-                                        border: '2px solid var(--border)',
-                                        borderRadius: '12px',
-                                        background: 'var(--background)',
-                                        color: 'var(--text)',
-                                        fontSize: '1rem',
-                                        fontWeight: '500'
-                                    }}
-                                />
-                                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.8rem', marginBottom: '0.8rem' }}>
+                            <div className="add-task-form">
+                                <h3>➕ Yeni Hatırlatıcı</h3>
+                                <div className="form-group">
+                                    <input
+                                        type="text"
+                                        value={newTask.title}
+                                        onChange={(e) => setNewTask({ ...newTask, title: e.target.value })}
+                                        placeholder="Hatırlatıcı başlığı..."
+                                        onKeyPress={(e) => e.key === 'Enter' && addTask()}
+                                        className="input-field"
+                                    />
+                                </div>
+                                <div className="form-row">
                                     <select
                                         value={newTask.priority}
                                         onChange={(e) => setNewTask({ ...newTask, priority: e.target.value })}
-                                        style={{
-                                            padding: '0.7rem',
-                                            border: '2px solid var(--border)',
-                                            borderRadius: '10px',
-                                            background: 'var(--background)',
-                                            color: 'var(--text)',
-                                            fontSize: '0.9rem',
-                                            cursor: 'pointer'
-                                        }}
+                                        className="select-field"
                                     >
-                                        <option value="LOW">🟢 Düşük Öncelik</option>
-                                        <option value="MEDIUM">🟡 Orta Öncelik</option>
-                                        <option value="HIGH">🔴 Yüksek Öncelik</option>
+                                        <option value="LOW">🟢 Düşük</option>
+                                        <option value="MEDIUM">🟡 Orta</option>
+                                        <option value="HIGH">🔴 Yüksek</option>
                                     </select>
                                     <select
                                         value={newTask.category}
                                         onChange={(e) => setNewTask({ ...newTask, category: e.target.value })}
-                                        style={{
-                                            padding: '0.7rem',
-                                            border: '2px solid var(--border)',
-                                            borderRadius: '10px',
-                                            background: 'var(--background)',
-                                            color: 'var(--text)',
-                                            fontSize: '0.9rem',
-                                            cursor: 'pointer'
-                                        }}
+                                        className="select-field"
                                     >
                                         <option value="PERSONAL">👤 Kişisel</option>
                                         <option value="STUDY">📚 Ders</option>
@@ -506,73 +282,36 @@ export default function ProductivityMenu({ isMobile, onOpen }) {
                                         <option value="EXAM">📅 Sınav</option>
                                     </select>
                                 </div>
-                                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.8rem', marginBottom: '0.8rem' }}>
+                                <div className="form-row">
                                     <input
                                         type="date"
                                         value={newTask.dueDate}
                                         onChange={(e) => setNewTask({ ...newTask, dueDate: e.target.value })}
-                                        style={{
-                                            padding: '0.7rem',
-                                            border: '2px solid var(--border)',
-                                            borderRadius: '10px',
-                                            background: 'var(--background)',
-                                            color: 'var(--text)',
-                                            fontSize: '0.9rem',
-                                            cursor: 'pointer'
-                                        }}
+                                        className="input-field"
                                     />
                                     <input
                                         type="time"
                                         value={newTask.dueTime}
                                         onChange={(e) => setNewTask({ ...newTask, dueTime: e.target.value })}
-                                        style={{
-                                            padding: '0.7rem',
-                                            border: '2px solid var(--border)',
-                                            borderRadius: '10px',
-                                            background: 'var(--background)',
-                                            color: 'var(--text)',
-                                            fontSize: '0.9rem',
-                                            cursor: 'pointer'
-                                        }}
+                                        className="input-field"
                                     />
                                 </div>
                                 <button
                                     onClick={addTask}
                                     disabled={!newTask.title.trim() || saving}
-                                    style={{
-                                        width: '100%',
-                                        padding: '0.9rem',
-                                        background: newTask.title.trim() ? 'linear-gradient(135deg, #667eea, #764ba2)' : 'var(--border)',
-                                        color: 'white',
-                                        border: 'none',
-                                        borderRadius: '12px',
-                                        cursor: newTask.title.trim() ? 'pointer' : 'not-allowed',
-                                        fontWeight: '700',
-                                        fontSize: '1rem',
-                                        boxShadow: newTask.title.trim() ? '0 4px 15px rgba(102, 126, 234, 0.3)' : 'none'
-                                    }}
+                                    className={`submit-btn ${newTask.title.trim() ? 'active' : 'disabled'}`}
                                 >
-                                    {saving ? '⏳ Kaydediliyor...' : '✅ Hatırlatıcı Ekle'}
+                                    {saving ? '⏳ Kaydediliyor...' : '✅ Ekle'}
                                 </button>
                             </div>
 
                             {/* Filter Chips */}
-                            <div style={{ display: 'flex', gap: '0.6rem', marginBottom: '1.2rem', flexWrap: 'wrap' }}>
+                            <div className="filter-chips">
                                 {['ALL', 'PERSONAL', 'STUDY', 'ASSIGNMENT', 'PROJECT', 'EXAM'].map(cat => (
                                     <button
                                         key={cat}
                                         onClick={() => setFilter(cat)}
-                                        style={{
-                                            padding: '0.5rem 1rem',
-                                            background: filter === cat ? 'linear-gradient(135deg, #667eea, #764ba2)' : 'var(--secondary)',
-                                            color: filter === cat ? 'white' : 'var(--text)',
-                                            border: filter === cat ? 'none' : '2px solid var(--border)',
-                                            borderRadius: '20px',
-                                            cursor: 'pointer',
-                                            fontSize: '0.85rem',
-                                            fontWeight: '600',
-                                            boxShadow: filter === cat ? '0 4px 12px rgba(102, 126, 234, 0.3)' : 'none'
-                                        }}
+                                        className={`chip ${filter === cat ? 'active' : ''}`}
                                     >
                                         {cat === 'ALL' ? '📋 Tümü' : cat === 'PERSONAL' ? '👤 Kişisel' : cat === 'STUDY' ? '📚 Ders' : cat === 'ASSIGNMENT' ? '📝 Ödev' : cat === 'PROJECT' ? '🚀 Proje' : '📅 Sınav'}
                                     </button>
@@ -580,11 +319,10 @@ export default function ProductivityMenu({ isMobile, onOpen }) {
                             </div>
 
                             {/* Task List */}
-                            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.8rem' }}>
+                            <div className="task-list">
                                 {tasks
                                     .filter(t => filter === 'ALL' || t.category === filter)
                                     .sort((a, b) => {
-                                        // Sort by completion status (incomplete first), then by date
                                         if (a.completed === b.completed) {
                                             return new Date(b.createdAt) - new Date(a.createdAt);
                                         }
@@ -593,77 +331,37 @@ export default function ProductivityMenu({ isMobile, onOpen }) {
                                     .map(task => {
                                         const deadlineStatus = getDeadlineStatus(task);
                                         return (
-                                            <div key={task.id} style={{
-                                                padding: '1.2rem',
-                                                background: 'var(--secondary)',
-                                                borderRadius: '14px',
-                                                borderLeft: `5px solid ${task.completed ? '#2196F3' : task.priority === 'HIGH' ? '#FF416C' : task.priority === 'MEDIUM' ? '#FFB75E' : '#4CAF50'}`,
-                                                boxShadow: '0 2px 8px rgba(0,0,0,0.05)',
-                                                opacity: task.completed ? 0.7 : 1,
-                                                transition: 'all 0.3s ease'
-                                            }}>
-                                                <div style={{ display: 'flex', alignItems: 'start', gap: '1rem' }}>
+                                            <div key={task.id} className={`task-item ${task.completed ? 'completed' : ''}`}>
+                                                <div className="task-row-1">
                                                     <input
                                                         type="checkbox"
                                                         checked={task.completed}
                                                         onChange={() => updateTask(task.id, { completed: !task.completed })}
-                                                        style={{ width: '20px', height: '20px', cursor: 'pointer', marginTop: '2px' }}
+                                                        className="task-checkbox"
                                                     />
-                                                    <div style={{ flex: 1 }}>
-                                                        <div style={{
-                                                            fontSize: '1rem',
-                                                            fontWeight: '600',
-                                                            color: 'var(--text)',
-                                                            marginBottom: '0.3rem',
-                                                            textDecoration: task.completed ? 'line-through' : 'none'
-                                                        }}>
-                                                            {task.title}
-                                                        </div>
-                                                        <div style={{ display: 'flex', gap: '0.8rem', fontSize: '0.75rem', flexWrap: 'wrap' }}>
-                                                            <span style={{
-                                                                padding: '0.2rem 0.6rem',
-                                                                background: task.completed ? '#E3F2FD' : task.priority === 'HIGH' ? '#FFEBEE' : task.priority === 'MEDIUM' ? '#FFF3E0' : '#E8F5E9',
-                                                                color: task.completed ? '#1976D2' : task.priority === 'HIGH' ? '#C62828' : task.priority === 'MEDIUM' ? '#EF6C00' : '#2E7D32',
-                                                                borderRadius: '12px',
-                                                                fontWeight: '600'
-                                                            }}>
-                                                                {task.completed ? '✅ Yapıldı' : task.priority === 'HIGH' ? '🔴 Acil' : task.priority === 'MEDIUM' ? '🟡 Orta' : '🟢 Düşük'}
-                                                            </span>
-                                                            {task.dueDate && (
-                                                                <span style={{
-                                                                    padding: '0.2rem 0.6rem',
-                                                                    background: deadlineStatus === 'overdue' ? '#FFEBEE' : deadlineStatus === 'urgent' ? '#FFF3E0' : deadlineStatus === 'soon' ? '#E3F2FD' : '#F5F5F5',
-                                                                    color: deadlineStatus === 'overdue' ? '#C62828' : deadlineStatus === 'urgent' ? '#EF6C00' : deadlineStatus === 'soon' ? '#1976D2' : '#666',
-                                                                    borderRadius: '12px',
-                                                                    fontWeight: '600'
-                                                                }}>
-                                                                    {deadlineStatus === 'overdue' ? '❌ ' : deadlineStatus === 'urgent' ? '⏰ ' : deadlineStatus === 'soon' ? '📅 ' : '📆 '}
-                                                                    {formatDeadline(task)}
-                                                                </span>
-                                                            )}
-                                                        </div>
-                                                    </div>
-                                                    <button
-                                                        onClick={() => deleteTask(task.id)}
-                                                        style={{
-                                                            background: 'none',
-                                                            border: 'none',
-                                                            color: '#FF416C',
-                                                            cursor: 'pointer',
-                                                            fontSize: '1.3rem'
-                                                        }}
-                                                    >
+                                                    <div className="task-title">{task.title}</div>
+                                                    <button onClick={() => deleteTask(task.id)} className="delete-btn">
                                                         🗑️
                                                     </button>
+                                                </div>
+                                                <div className="task-row-2">
+                                                    <span className={`priority-badge priority-${task.priority}`}>
+                                                        {task.priority === 'HIGH' ? '🔴 Yüksek' : task.priority === 'MEDIUM' ? '🟡 Orta' : '🟢 Düşük'}
+                                                    </span>
+                                                    {task.dueDate && (
+                                                        <span className={`date-badge deadline-${deadlineStatus}`}>
+                                                            📅 {formatDeadline(task)}
+                                                        </span>
+                                                    )}
                                                 </div>
                                             </div>
                                         );
                                     })}
 
                                 {tasks.length === 0 && (
-                                    <div style={{ textAlign: 'center', padding: '3rem 1rem', color: 'var(--text-secondary)' }}>
-                                        <div style={{ fontSize: '3rem', marginBottom: '0.5rem' }}>🎉</div>
-                                        <div style={{ fontWeight: '600' }}>Henüz hatırlatıcı eklemedin!</div>
+                                    <div className="empty-state">
+                                        <div className="empty-icon">🎉</div>
+                                        <div>Henüz hatırlatıcı eklemedin!</div>
                                     </div>
                                 )}
                             </div>
@@ -672,14 +370,466 @@ export default function ProductivityMenu({ isMobile, onOpen }) {
                 </>
             )}
 
-            <style jsx global>{`
+            <style jsx>{`
+                /* Trigger Button */
+                .trigger-btn {
+                    background: none;
+                    border: none;
+                    color: var(--text);
+                    cursor: pointer;
+                    font-size: 1rem;
+                    font-weight: 600;
+                    display: flex;
+                    align-items: center;
+                    gap: 0.3rem;
+                    position: relative;
+                    transition: all 0.2s ease;
+                }
+                .trigger-btn.mobile {
+                    width: 100%;
+                    text-align: left;
+                    padding: 1rem;
+                    border-radius: 8px;
+                }
+                .trigger-btn.desktop {
+                    padding: 0.5rem 0;
+                }
+                .trigger-btn:hover {
+                    color: var(--primary);
+                }
+                .trigger-btn.mobile:active {
+                    background-color: var(--secondary);
+                }
+                .badge {
+                    background: #ff4444;
+                    color: white;
+                    border-radius: 50%;
+                    min-width: 18px;
+                    height: 18px;
+                    font-size: 10px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    font-weight: bold;
+                    padding: 0 4px;
+                    border: 2px solid var(--background);
+                }
+                .trigger-btn.desktop .badge {
+                    position: absolute;
+                    top: -8px;
+                    right: -8px;
+                }
+                .trigger-btn.mobile .badge {
+                    margin-left: auto;
+                }
+                .underline {
+                    position: absolute;
+                    width: 0;
+                    height: 2px;
+                    bottom: 0;
+                    left: 50%;
+                    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                    transform: translateX(-50%);
+                    border-radius: 2px;
+                }
+                .trigger-btn.desktop:hover .underline {
+                    width: 100%;
+                }
+
+                /* Modal Overlay */
+                .modal-overlay {
+                    position: fixed;
+                    top: 0;
+                    left: 0;
+                    right: 0;
+                    bottom: 0;
+                    background: rgba(0, 0, 0, 0.6);
+                    backdrop-filter: blur(4px);
+                    z-index: 1999;
+                    animation: fadeIn 0.3s;
+                }
+
+                /* Modal Container */
+                .modal-container {
+                    position: fixed;
+                    background: var(--background);
+                    z-index: 2000;
+                    display: flex;
+                    flex-direction: column;
+                    box-shadow: 0 25px 50px rgba(0,0,0,0.3);
+                    overflow: hidden;
+                    animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+                }
+
+                /* Desktop Modal Style */
+                @media (min-width: 769px) {
+                    .modal-container {
+                        top: 50%;
+                        left: 50%;
+                        transform: translate(-50%, -50%);
+                        width: 90%;
+                        max-width: 600px;
+                        max-height: 85vh;
+                        border-radius: 24px;
+                    }
+                }
+
+                /* Mobile Modal Style (Bottom Sheet) */
+                @media (max-width: 768px) {
+                    .modal-container {
+                        bottom: 0;
+                        left: 0;
+                        right: 0;
+                        width: 100%;
+                        height: 85vh; /* Takes up 85% of screen */
+                        border-radius: 24px 24px 0 0;
+                        transform: translateY(0);
+                    }
+                }
+
+                .modal-header {
+                    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                    padding: 1.2rem 1.5rem;
+                    color: white;
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                    flex-shrink: 0;
+                }
+                .modal-header h2 {
+                    margin: 0;
+                    font-size: 1.2rem;
+                    font-weight: 700;
+                }
+                .close-btn {
+                    background: rgba(255,255,255,0.2);
+                    border: none;
+                    color: white;
+                    width: 32px;
+                    height: 32px;
+                    border-radius: 50%;
+                    cursor: pointer;
+                    font-size: 1.2rem;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    transition: background 0.2s;
+                }
+                .close-btn:hover {
+                    background: rgba(255,255,255,0.3);
+                }
+
+                .modal-content {
+                    flex: 1;
+                    overflow-y: auto;
+                    padding: 1.5rem;
+                    -webkit-overflow-scrolling: touch;
+                }
+
+                /* Status Message */
+                .status-message {
+                    padding: 0.8rem;
+                    color: white;
+                    text-align: center;
+                    font-weight: 600;
+                    font-size: 0.9rem;
+                }
+                .status-message.success {
+                    background: linear-gradient(135deg, #11998e, #38ef7d);
+                }
+                .status-message.error {
+                    background: linear-gradient(135deg, #FF416C, #FF4B2B);
+                }
+
+                /* Add Task Form */
+                .add-task-form {
+                    background: var(--secondary);
+                    padding: 1.2rem;
+                    border-radius: 16px;
+                    margin-bottom: 1.5rem;
+                    border: 1px solid var(--border);
+                }
+                .add-task-form h3 {
+                    margin: 0 0 1rem 0;
+                    font-size: 1rem;
+                    font-weight: 700;
+                    color: var(--text);
+                }
+                .form-group {
+                    margin-bottom: 0.8rem;
+                }
+                .form-row {
+                    display: grid;
+                    grid-template-columns: 1fr 1fr;
+                    gap: 0.8rem;
+                    margin-bottom: 0.8rem;
+                }
+                .input-field, .select-field {
+                    width: 100%;
+                    padding: 0.8rem;
+                    border: 1px solid var(--border);
+                    border-radius: 10px;
+                    background: var(--background);
+                    color: var(--text);
+                    font-size: 0.9rem;
+                    outline: none;
+                    transition: border-color 0.2s;
+                }
+                .input-field:focus, .select-field:focus {
+                    border-color: #667eea;
+                }
+                .submit-btn {
+                    width: 100%;
+                    padding: 0.9rem;
+                    border: none;
+                    border-radius: 12px;
+                    color: white;
+                    font-weight: 700;
+                    font-size: 1rem;
+                    cursor: pointer;
+                    transition: transform 0.1s;
+                }
+                .submit-btn.active {
+                    background: linear-gradient(135deg, #667eea, #764ba2);
+                    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+                }
+                .submit-btn.disabled {
+                    background: var(--border);
+                    cursor: not-allowed;
+                }
+                .submit-btn:active {
+                    transform: scale(0.98);
+                }
+
+                /* Filter Chips */
+                .filter-chips {
+                    display: flex;
+                    gap: 0.5rem;
+                    margin-bottom: 1.2rem;
+                    overflow-x: auto;
+                    padding-bottom: 0.5rem;
+                    -webkit-overflow-scrolling: touch;
+                }
+                .chip {
+                    padding: 0.5rem 1rem;
+                    background: var(--secondary);
+                    color: var(--text);
+                    border: 1px solid var(--border);
+                    border-radius: 20px;
+                    cursor: pointer;
+                    font-size: 0.85rem;
+                    font-weight: 600;
+                    white-space: nowrap;
+                    transition: all 0.2s;
+                }
+                .chip.active {
+                    background: linear-gradient(135deg, #667eea, #764ba2);
+                    color: white;
+                    border: none;
+                    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+                }
+
+                /* Task List */
+                .task-list {
+                    display: flex;
+                    flex-direction: column;
+                    gap: 0.8rem;
+                }
+                .task-item {
+                    padding: 1rem;
+                    background: var(--secondary);
+                    border-radius: 12px;
+                    border: 1px solid var(--border);
+                    transition: all 0.2s ease;
+                }
+                .task-item:hover {
+                    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+                }
+                .task-item.completed { opacity: 0.5; }
+
+                /* Row 1: Checkbox + Title + Delete */
+                .task-row-1 {
+                    display: flex;
+                    align-items: center;
+                    gap: 0.75rem;
+                    margin-bottom: 0.5rem;
+                }
+                .task-checkbox {
+                    width: 20px;
+                    height: 20px;
+                    cursor: pointer;
+                    accent-color: #667eea;
+                    flex-shrink: 0;
+                }
+                .task-title {
+                    flex: 1;
+                    font-size: 1rem;
+                    font-weight: 600;
+                    color: var(--text);
+                    line-height: 1.4;
+                    word-wrap: break-word;
+                }
+                .task-item.completed .task-title {
+                    text-decoration: line-through;
+                    color: var(--text-secondary);
+                }
+                .delete-btn {
+                    background: none;
+                    border: none;
+                    color: #999;
+                    cursor: pointer;
+                    font-size: 1.1rem;
+                    padding: 0.25rem;
+                    opacity: 0.7;
+                    transition: all 0.2s;
+                    flex-shrink: 0;
+                    line-height: 1;
+                }
+                .delete-btn:hover {
+                    opacity: 1;
+                    color: #FF416C;
+                    transform: scale(1.1);
+                }
+
+                /* Row 2: Priority + Date */
+                .task-row-2 {
+                    display: flex;
+                    align-items: center;
+                    gap: 0.6rem;
+                    margin-left: 2.75rem; /* Align with title */
+                    flex-wrap: wrap;
+                }
+                .priority-badge {
+                    display: inline-flex;
+                    align-items: center;
+                    padding: 0.25rem 0.6rem;
+                    border-radius: 6px;
+                    font-size: 0.75rem;
+                    font-weight: 600;
+                    line-height: 1;
+                }
+                .priority-badge.priority-HIGH {
+                    background: #FFE5E5;
+                    color: #D32F2F;
+                }
+                .priority-badge.priority-MEDIUM {
+                    background: #FFF4E5;
+                    color: #F57C00;
+                }
+                .priority-badge.priority-LOW {
+                    background: #E8F5E9;
+                    color: #388E3C;
+                }
+                .date-badge {
+                    font-size: 0.75rem;
+                    color: var(--text-secondary);
+                    font-weight: 500;
+                    line-height: 1;
+                }
+                .date-badge.deadline-overdue {
+                    color: #D32F2F;
+                    font-weight: 700;
+                }
+                .date-badge.deadline-urgent {
+                    color: #F57C00;
+                    font-weight: 600;
+                }
+
+                /* Empty State */
+                .empty-state {
+                    text-align: center;
+                    padding: 3rem 1rem;
+                    color: var(--text-secondary);
+                }
+                .empty-icon {
+                    font-size: 3rem;
+                    margin-bottom: 0.5rem;
+                }
+
+                /* Notification Box */
+                .notification-box {
+                    margin-bottom: 1.5rem;
+                    padding: 1rem;
+                    background: #FFF3CD;
+                    border-radius: 12px;
+                    border: 2px solid #FFD700;
+                }
+                .notification-box h4 {
+                    margin: 0 0 0.5rem 0;
+                    font-size: 1rem;
+                    font-weight: 700;
+                    color: #856404;
+                }
+                .text-danger { color: #721c24; margin: 0.5rem 0; font-size: 0.9rem; }
+                .text-warning { color: #856404; margin: 0.5rem 0; font-size: 0.9rem; }
+
+                /* Alert Overlay */
+                .alert-overlay {
+                    position: fixed;
+                    top: 0;
+                    left: 0;
+                    right: 0;
+                    bottom: 0;
+                    background: rgba(0, 0, 0, 0.7);
+                    z-index: 2000;
+                    animation: fadeIn 0.3s;
+                }
+                .alert-modal {
+                    position: fixed;
+                    top: 50%;
+                    left: 50%;
+                    transform: translate(-50%, -50%);
+                    background: white;
+                    border-radius: 20px;
+                    padding: 2rem;
+                    z-index: 2001;
+                    max-width: 400px;
+                    text-align: center;
+                    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+                    animation: slideIn 0.3s;
+                }
+                .alert-icon { font-size: 4rem; margin-bottom: 1rem; }
+                .alert-title { color: #FF416C; margin-bottom: 0.5rem; font-size: 1.5rem; }
+                .alert-message { color: #333; font-size: 1.2rem; font-weight: 600; margin-bottom: 1rem; }
+                .alert-actions { display: flex; gap: 1rem; justify-content: center; }
+                .btn-primary {
+                    padding: 0.8rem 1.5rem;
+                    background: linear-gradient(135deg, #11998e, #38ef7d);
+                    color: white;
+                    border: none;
+                    border-radius: 12px;
+                    cursor: pointer;
+                    font-weight: 700;
+                }
+                .btn-secondary {
+                    padding: 0.8rem 1.5rem;
+                    background: var(--secondary);
+                    color: var(--text);
+                    border: 2px solid var(--border);
+                    border-radius: 12px;
+                    cursor: pointer;
+                    font-weight: 700;
+                }
+
+                /* Animations */
                 @keyframes fadeIn {
                     from { opacity: 0; }
                     to { opacity: 1; }
                 }
+                @keyframes slideUp {
+                    from { transform: translateY(100%); }
+                    to { transform: translateY(0); }
+                }
                 @keyframes slideIn {
                     from { transform: translate(-50%, -60%); opacity: 0; }
                     to { transform: translate(-50%, -50%); opacity: 1; }
+                }
+                @media (min-width: 769px) {
+                    @keyframes slideUp {
+                        from { transform: translate(-50%, -60%); opacity: 0; }
+                        to { transform: translate(-50%, -50%); opacity: 1; }
+                    }
                 }
             `}</style>
         </>
