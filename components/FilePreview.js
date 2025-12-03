@@ -189,7 +189,7 @@ export default function FilePreview({ file, url, fileName, onRemove }) {
             {url ? (
                 <a
                     href={url}
-                    download
+                    download={`Notvarmi.com_${name}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     style={{ textDecoration: 'none', display: 'block' }}
