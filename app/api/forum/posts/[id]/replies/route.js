@@ -59,7 +59,10 @@ export async function POST(req, { params }) {
             for (const file of files) {
                 if (file && file.size > 0) {
                     const buffer = Buffer.from(await file.arrayBuffer());
-                    const filename = `${Date.now()}-${file.name.replace(/\s/g, '_')}`;
+                    const randomId = Math.random().toString(36).substring(2, 8);
+                    const originalName = file.name.replace(/\.[^/.]+$/, '').replace(/\s/g, '_');
+                    const extension = file.name.split('.').pop();
+                    const filename = `${originalName}_${randomId}.${extension}`;
 
                     // Check if it's an image
                     if (file.type.startsWith('image/')) {

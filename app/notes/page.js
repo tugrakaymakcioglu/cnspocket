@@ -385,8 +385,7 @@ export default function Notes() {
                                                         return (
                                                             <a
                                                                 key={index}
-                                                                href={url}
-                                                                download={`Notvarmi.com_${filename}`}
+                                                                href={`/api/download?url=${encodeURIComponent(url)}`}
                                                                 onClick={(e) => e.stopPropagation()}
                                                                 style={{
                                                                     display: 'flex',

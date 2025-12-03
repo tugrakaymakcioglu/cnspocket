@@ -97,7 +97,10 @@ export async function POST(req) {
                 console.log('Processing file:', file.name, 'Size:', file.size);
                 if (file.size > 0) {
                     const buffer = Buffer.from(await file.arrayBuffer());
-                    const filename = Date.now() + '_' + file.name.replaceAll(' ', '_');
+                    const randomId = Math.random().toString(36).substring(2, 8);
+                    const originalName = file.name.replace(/\.[^/.]+$/, '').replaceAll(' ', '_');
+                    const extension = file.name.split('.').pop();
+                    const filename = `${originalName}_${randomId}.${extension}`;
 
                     try {
                         const filepath = path.join(uploadDir, filename);

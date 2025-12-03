@@ -188,8 +188,7 @@ export default function FilePreview({ file, url, fileName, onRemove }) {
         }}>
             {url ? (
                 <a
-                    href={url}
-                    download={`Notvarmi.com_${name}`}
+                    href={`/api/download?url=${encodeURIComponent(url)}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     style={{ textDecoration: 'none', display: 'block' }}
