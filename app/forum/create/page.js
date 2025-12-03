@@ -1,9 +1,11 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useForumPost } from '@/contexts/ForumPostContext';
+import { useAlert } from '@/contexts/AlertContext';
 import FilePreview from '@/components/FilePreview';
 
 export default function CreatePost() {
@@ -14,13 +16,64 @@ export default function CreatePost() {
     const [loading, setLoading] = useState(false);
     const [uploadProgress, setUploadProgress] = useState(0);
     const [showWarningModal, setShowWarningModal] = useState(false);
+    const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
     const router = useRouter();
     const { t } = useLanguage();
+    const { startSubmission, pendingPost } = useForumPost();
+    const { showAlert, showConfirm } = useAlert();
 
-    const handleFileChange = (e) => {
+    useEffect(() => {
+        if (pendingPost) {
+            setTitle(pendingPost.title);
+            setContent(pendingPost.content);
+            setTags(pendingPost.tags);
+            // Files cannot be programmatically set to file input due to security,
+            // but we can preserve them in context if needed.
+            // For now, user might need to re-select files or we handle it differently.
+            // However, the context has the files, so we can potentially display them.
+            if (pendingPost.files) {
+                setFiles(pendingPost.files);
+            }
+        }
+    }, [pendingPost]);
+
+    // Track unsaved changes
+    useEffect(() => {
+        const hasContent = title.trim() !== '' || content.trim() !== '' || tags.trim() !== '' || files.length > 0;
+        setHasUnsavedChanges(hasContent);
+    }, [title, content, tags, files]);
+
+    // Warn on browser close/refresh
+    useEffect(() => {
+        const handleBeforeUnload = (e) => {
+            if (hasUnsavedChanges) {
+                e.preventDefault();
+                e.returnValue = '';
+            }
+        };
+
+        window.addEventListener('beforeunload', handleBeforeUnload);
+        return () => window.removeEventListener('beforeunload', handleBeforeUnload);
+    }, [hasUnsavedChanges]);
+
+    // Custom Link wrapper to intercept navigation
+    const handleLinkClick = async (e, href) => {
+        if (hasUnsavedChanges) {
+            e.preventDefault();
+            const confirmed = await showConfirm(
+                'Değişiklikleriniz kaydedilmedi! Çıkışı onaylıyor musunuz? Tüm verileriniz kaybolacak.'
+            );
+            if (confirmed) {
+                setHasUnsavedChanges(false);
+                router.push(href);
+            }
+        }
+    };
+
+    const handleFileChange = async (e) => {
         const selectedFiles = Array.from(e.target.files);
         if (files.length + selectedFiles.length > 5) {
-            alert(t.forumCreate.maxFiles || 'Maksimum 5 dosya yükleyebilirsiniz');
+            await showAlert(t.forumCreate.maxFiles || 'Maksimum 5 dosya yükleyebilirsiniz', 'warning');
             return;
         }
         setFiles((prev) => [...prev, ...selectedFiles]);
@@ -37,67 +90,41 @@ export default function CreatePost() {
 
     const handleConfirmPost = async () => {
         setShowWarningModal(false);
-        setLoading(true);
-        setUploadProgress(0);
+        setHasUnsavedChanges(false); // Clear unsaved changes flag
 
-        const formData = new FormData();
-        formData.append('title', title);
-        formData.append('content', content);
-        formData.append('tags', tags);
-        files.forEach((file) => {
-            formData.append('files', file);
+        startSubmission({
+            title,
+            content,
+            tags,
+            files
         });
-
-        const xhr = new XMLHttpRequest();
-        xhr.open('POST', '/api/forum/posts', true);
-
-        xhr.upload.onprogress = (event) => {
-            if (event.lengthComputable) {
-                const percentComplete = Math.round((event.loaded / event.total) * 100);
-                setUploadProgress(percentComplete);
-            }
-        };
-
-        xhr.onload = () => {
-            if (xhr.status >= 200 && xhr.status < 300) {
-                router.push('/forum');
-                router.refresh();
-            } else {
-                alert(t.forumCreate.createFailed || 'Gönderi oluşturulamadı');
-            }
-            setLoading(false);
-        };
-
-        xhr.onerror = () => {
-            console.error('Error creating post');
-            alert(t.forumCreate.error || 'Bir hata oluştu');
-            setLoading(false);
-        };
-
-        xhr.send(formData);
     };
 
     return (
         <div style={{ maxWidth: '900px', margin: '2rem auto', padding: '0 1rem' }}>
             {/* Header */}
             <div style={{ marginBottom: '2rem' }}>
-                <Link href="/forum" style={{
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    gap: '0.5rem',
-                    marginBottom: '1.5rem',
-                    color: 'var(--text-secondary)',
-                    textDecoration: 'none',
-                    fontSize: '0.9rem',
-                    transition: 'color 0.2s ease'
-                }}
+                <a
+                    href="/forum"
+                    onClick={(e) => handleLinkClick(e, '/forum')}
+                    style={{
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '0.5rem',
+                        marginBottom: '1.5rem',
+                        color: 'var(--text-secondary)',
+                        textDecoration: 'none',
+                        fontSize: '0.9rem',
+                        transition: 'color 0.2s ease',
+                        cursor: 'pointer'
+                    }}
                     onMouseEnter={(e) => e.currentTarget.style.color = 'var(--accent-teal)'}
                     onMouseLeave={(e) => e.currentTarget.style.color = 'var(--text-secondary)'}>
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                         <path d="M19 12H5M12 19l-7-7 7-7" />
                     </svg>
                     {t.forumDetail.backToForum || 'Foruma Dön'}
-                </Link>
+                </a>
 
                 <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
                     <h1 style={{
@@ -577,6 +604,7 @@ export default function CreatePost() {
                     </div>
                 </div>
             )}
+
         </div>
     );
 }

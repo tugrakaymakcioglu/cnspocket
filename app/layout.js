@@ -7,6 +7,8 @@ import GoogleAnalytics from '@/components/GoogleAnalytics';
 import SplashScreen from '@/components/SplashScreen';
 import SEOHead from '@/components/SEOHead';
 import { generateOrganizationSchema, generateWebSiteSchema, baseMetadata } from '@/lib/seo';
+import { ForumPostProvider } from '@/contexts/ForumPostContext';
+import { AlertProvider } from '@/contexts/AlertContext';
 import './globals.css'
 import { Inter, Pacifico } from 'next/font/google'
 
@@ -134,23 +136,27 @@ export default function RootLayout({ children }) {
             </head>
             <body suppressHydrationWarning={true} className={`${inter.className} ${pacifico.variable}`}>
                 <Providers>
-                    <SplashScreen>
-                        <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
-                            <Navbar />
-                            <main style={{
-                                flex: 1,
-                                padding: '2rem',
-                                maxWidth: '1200px',
-                                margin: '0 auto',
-                                width: '100%'
-                            }} className="responsive-main">
-                                {children}
-                            </main>
-                            <Footer />
-                        </div>
-                        <NotificationBell />
-                        <Calendar />
-                    </SplashScreen>
+                    <AlertProvider>
+                        <ForumPostProvider>
+                            <SplashScreen>
+                                <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
+                                    <Navbar />
+                                    <main style={{
+                                        flex: 1,
+                                        padding: '2rem',
+                                        maxWidth: '1200px',
+                                        margin: '0 auto',
+                                        width: '100%'
+                                    }} className="responsive-main">
+                                        {children}
+                                    </main>
+                                    <Footer />
+                                </div>
+                                <NotificationBell />
+                                <Calendar />
+                            </SplashScreen>
+                        </ForumPostProvider>
+                    </AlertProvider>
                 </Providers>
             </body>
         </html>
