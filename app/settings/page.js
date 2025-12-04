@@ -9,11 +9,13 @@ import departments from '@/lib/departments';
 import ToggleSwitch from '@/components/ToggleSwitch';
 import LoadingScreen from '@/components/LoadingScreen';
 import { useAlert } from '@/contexts/AlertContext';
+import { useTheme } from '@/components/ThemeProvider';
 
 export default function SettingsPage() {
     const { data: session, status, update: updateSession } = useSession();
     const router = useRouter();
     const { showAlert, showConfirm } = useAlert();
+    const { changeTheme } = useTheme();
     const fileInputRef = useRef(null);
     const [activeTab, setActiveTab] = useState('profile');
 
@@ -326,6 +328,7 @@ export default function SettingsPage() {
     const handleThemeChange = async (theme) => {
         const newSettings = { ...appearanceSettings, theme };
         setAppearanceSettings(newSettings);
+        changeTheme(theme); // Apply theme immediately
 
         try {
             await fetch('/api/settings/appearance', {
@@ -333,7 +336,6 @@ export default function SettingsPage() {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(newSettings)
             });
-            // TODO: Apply theme to document
         } catch (error) {
             console.error('Error updating theme:', error);
             setAppearanceSettings(appearanceSettings);
@@ -526,7 +528,7 @@ export default function SettingsPage() {
                                 width: isMobile ? 'auto' : '100%',
                                 padding: '0.9rem 1.2rem',
                                 marginBottom: isMobile ? '0' : '0.5rem',
-                                background: activeTab === tab.id ? 'var(--accent-purple)' : 'transparent',
+                                background: activeTab === tab.id ? 'linear-gradient(135deg, #f97316 0%, #ec4899 100%)' : 'transparent',
                                 color: activeTab === tab.id ? 'white' : 'var(--text)',
                                 border: 'none',
                                 borderRadius: '10px',
@@ -580,7 +582,7 @@ export default function SettingsPage() {
                                             borderRadius: '50%',
                                             margin: '0 auto',
                                             overflow: 'hidden',
-                                            border: '3px solid var(--accent-blue)',
+                                            border: '3px solid #f97316',
                                             cursor: 'pointer',
                                             position: 'relative',
                                             backgroundColor: 'var(--background)',
@@ -620,7 +622,7 @@ export default function SettingsPage() {
                                             marginTop: '1rem',
                                             padding: '0.5rem 1rem',
                                             backgroundColor: 'var(--secondary)',
-                                            color: 'var(--accent-purple)',
+                                            color: '#f97316',
                                             border: '1px solid rgba(139, 92, 246, 0.3)',
                                             borderRadius: '6px',
                                             cursor: 'pointer',
@@ -798,7 +800,7 @@ export default function SettingsPage() {
                                     disabled={updating}
                                     style={{
                                         padding: '0.9rem 1.5rem',
-                                        backgroundColor: 'var(--accent-purple)',
+                                        background: 'linear-gradient(135deg, #f97316 0%, #ec4899 100%)',
                                         color: 'white',
                                         border: 'none',
                                         borderRadius: '8px',
@@ -886,7 +888,7 @@ export default function SettingsPage() {
                                     disabled={changingPassword}
                                     style={{
                                         padding: '0.9rem 1.5rem',
-                                        backgroundColor: 'var(--accent-blue)',
+                                        background: 'linear-gradient(135deg, #f97316 0%, #ec4899 100%)',
                                         color: 'white',
                                         border: 'none',
                                         borderRadius: '8px',
@@ -1141,9 +1143,9 @@ export default function SettingsPage() {
                                     <div style={{
                                         marginTop: '2rem',
                                         padding: '1.5rem',
-                                        background: 'linear-gradient(135deg, rgba(139, 92, 246, 0.1), rgba(236, 72, 153, 0.1))',
+                                        background: 'linear-gradient(135deg, rgba(251, 191, 36, 0.1), rgba(249, 115, 22, 0.1))',
                                         borderRadius: '12px',
-                                        border: '1px solid rgba(139, 92, 246, 0.3)'
+                                        border: '1px solid rgba(249, 115, 22, 0.3)'
                                     }}>
                                         <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1rem' }}>
                                             <span style={{ fontSize: '1.5rem' }}>🛡️</span>
@@ -1282,14 +1284,14 @@ export default function SettingsPage() {
                                                 style={{
                                                     padding: '1.5rem',
                                                     background: 'var(--background)',
-                                                    border: `2px solid ${isActive ? 'var(--accent-purple)' : 'var(--border)'}`,
+                                                    border: `2px solid ${isActive ? '#f97316' : 'var(--border)'}`,
                                                     borderRadius: '12px',
                                                     cursor: 'pointer',
                                                     textAlign: 'center',
                                                     transition: 'all 0.2s',
                                                     position: 'relative'
                                                 }}
-                                                onMouseEnter={(e) => { if (!isActive) e.currentTarget.style.borderColor = 'var(--accent-purple)'; }}
+                                                onMouseEnter={(e) => { if (!isActive) e.currentTarget.style.borderColor = '#f97316'; }}
                                                 onMouseLeave={(e) => { if (!isActive) e.currentTarget.style.borderColor = 'var(--border)'; }}
                                             >
                                                 {isActive && (
@@ -1297,7 +1299,7 @@ export default function SettingsPage() {
                                                         position: 'absolute',
                                                         top: '0.5rem',
                                                         right: '0.5rem',
-                                                        color: 'var(--accent-purple)',
+                                                        color: '#f97316',
                                                         fontSize: '1.2rem'
                                                     }}>✓</div>
                                                 )}

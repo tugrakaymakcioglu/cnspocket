@@ -20,7 +20,7 @@ function ToggleSwitch({ checked, onChange, disabled }) {
                 position: 'absolute',
                 cursor: disabled ? 'not-allowed' : 'pointer',
                 top: 0, left: 0, right: 0, bottom: 0,
-                backgroundColor: checked ? 'var(--accent-purple)' : '#ccc',
+                backgroundColor: checked ? '#f97316' : '#ccc',
                 borderRadius: '28px',
                 transition: '0.4s'
             }}>
