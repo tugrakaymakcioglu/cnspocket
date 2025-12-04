@@ -202,8 +202,8 @@ export default function UserProfile({ params }) {
                     border: '1px solid var(--border)'
                 }}
                     onMouseEnter={(e) => {
-                        e.currentTarget.style.color = 'var(--accent-purple)';
-                        e.currentTarget.style.borderColor = 'var(--accent-purple)';
+                        e.currentTarget.style.color = '#f97316';
+                        e.currentTarget.style.borderColor = '#f97316';
                         e.currentTarget.style.transform = 'translateX(-4px)';
                     }}
                     onMouseLeave={(e) => {
@@ -235,7 +235,7 @@ export default function UserProfile({ params }) {
                                 ? `url(${user.coverImage}) center/cover no-repeat`
                                 : user.coverColor
                                     ? user.coverColor
-                                    : 'linear-gradient(135deg, var(--accent-purple) 0%, #764ba2 100%)',
+                                    : 'linear-gradient(135deg, #fbbf24 0%, #f97316 50%, #ec4899 100%)',
                         position: 'relative',
                         transition: 'background 0.3s ease'
                     }}>
@@ -298,7 +298,7 @@ export default function UserProfile({ params }) {
                                                     flex: 1,
                                                     padding: '0.5rem',
                                                     borderRadius: '8px',
-                                                    border: coverType === 'color' ? '2px solid var(--accent-purple)' : '1px solid var(--border)',
+                                                    border: coverType === 'color' ? '2px solid #f97316' : '1px solid var(--border)',
                                                     background: coverType === 'color' ? 'var(--hover-bg)' : 'transparent',
                                                     color: 'var(--text)',
                                                     cursor: 'pointer'
@@ -312,7 +312,7 @@ export default function UserProfile({ params }) {
                                                     flex: 1,
                                                     padding: '0.5rem',
                                                     borderRadius: '8px',
-                                                    border: coverType === 'image' ? '2px solid var(--accent-purple)' : '1px solid var(--border)',
+                                                    border: coverType === 'image' ? '2px solid #f97316' : '1px solid var(--border)',
                                                     background: coverType === 'image' ? 'var(--hover-bg)' : 'transparent',
                                                     color: 'var(--text)',
                                                     cursor: 'pointer'
@@ -366,8 +366,8 @@ export default function UserProfile({ params }) {
                                                         color: 'var(--text-secondary)'
                                                     }}
                                                     onMouseEnter={(e) => {
-                                                        e.currentTarget.style.borderColor = 'var(--accent-purple)';
-                                                        e.currentTarget.style.color = 'var(--accent-purple)';
+                                                        e.currentTarget.style.borderColor = '#f97316';
+                                                        e.currentTarget.style.color = '#f97316';
                                                     }}
                                                     onMouseLeave={(e) => {
                                                         e.currentTarget.style.borderColor = 'var(--border)';
@@ -387,7 +387,7 @@ export default function UserProfile({ params }) {
                                                 style={{
                                                     flex: 1,
                                                     padding: '0.5rem',
-                                                    background: 'var(--accent-purple)',
+                                                    background: 'linear-gradient(135deg, #f97316 0%, #ec4899 100%)',
                                                     color: 'white',
                                                     border: 'none',
                                                     borderRadius: '8px',
@@ -484,7 +484,7 @@ export default function UserProfile({ params }) {
                                         height: isMobile ? '100px' : '160px',
                                         borderRadius: '50%',
                                         border: isMobile ? '4px solid var(--secondary)' : '6px solid var(--secondary)',
-                                        background: 'linear-gradient(135deg, var(--accent-purple) 0%, #764ba2 100%)',
+                                        background: 'linear-gradient(135deg, #fbbf24 0%, #f97316 50%, #ec4899 100%)',
                                         display: 'flex',
                                         alignItems: 'center',
                                         justifyContent: 'center',
@@ -572,8 +572,8 @@ export default function UserProfile({ params }) {
                                             marginBottom: '0.75rem'
                                         }}
                                         onMouseEnter={(e) => {
-                                            e.currentTarget.style.borderColor = 'var(--accent-purple)';
-                                            e.currentTarget.style.color = 'var(--accent-purple)';
+                                            e.currentTarget.style.borderColor = '#f97316';
+                                            e.currentTarget.style.color = '#f97316';
                                         }}
                                         onMouseLeave={(e) => {
                                             e.currentTarget.style.borderColor = 'var(--border)';
@@ -591,7 +591,7 @@ export default function UserProfile({ params }) {
                                             style={{
                                                 flex: 1,
                                                 padding: '0.5rem',
-                                                background: 'var(--accent-purple)',
+                                                background: 'linear-gradient(135deg, #f97316 0%, #ec4899 100%)',
                                                 color: 'white',
                                                 border: 'none',
                                                 borderRadius: '8px',
@@ -693,7 +693,7 @@ export default function UserProfile({ params }) {
                                 href={`/messages/${user.id}`}
                                 style={{
                                     padding: isMobile ? '0.75rem 1.5rem' : '1rem 2rem',
-                                    background: 'linear-gradient(135deg, var(--accent-purple) 0%, #764ba2 100%)',
+                                    background: 'linear-gradient(135deg, #f97316 0%, #ec4899 100%)',
                                     color: 'white',
                                     border: 'none',
                                     borderRadius: '50px',
@@ -704,16 +704,16 @@ export default function UserProfile({ params }) {
                                     alignItems: 'center',
                                     gap: '0.5rem',
                                     textDecoration: 'none',
-                                    boxShadow: '0 4px 15px rgba(102, 126, 234, 0.4)',
+                                    boxShadow: '0 4px 15px rgba(249, 115, 22, 0.4)',
                                     transition: 'all 0.3s ease'
                                 }}
                                 onMouseEnter={(e) => {
                                     e.currentTarget.style.transform = 'translateY(-2px)';
-                                    e.currentTarget.style.boxShadow = '0 6px 20px rgba(102, 126, 234, 0.6)';
+                                    e.currentTarget.style.boxShadow = '0 6px 20px rgba(249, 115, 22, 0.6)';
                                 }}
                                 onMouseLeave={(e) => {
                                     e.currentTarget.style.transform = 'translateY(0)';
-                                    e.currentTarget.style.boxShadow = '0 4px 15px rgba(102, 126, 234, 0.4)';
+                                    e.currentTarget.style.boxShadow = '0 4px 15px rgba(249, 115, 22, 0.4)';
                                 }}>
                                 💬 Mesaj Gönder
                             </Link>
@@ -735,7 +735,7 @@ export default function UserProfile({ params }) {
                         <div style={{
                             width: '120px',
                             height: '120px',
-                            background: 'linear-gradient(135deg, var(--accent-purple) 0%, #764ba2 100%)',
+                            background: 'linear-gradient(135deg, #fbbf24 0%, #f97316 50%, #ec4899 100%)',
                             borderRadius: '50%',
                             display: 'flex',
                             alignItems: 'center',
@@ -786,7 +786,7 @@ export default function UserProfile({ params }) {
                             onMouseEnter={(e) => {
                                 e.currentTarget.style.transform = 'translateY(-5px)';
                                 e.currentTarget.style.boxShadow = '0 15px 40px rgba(0,0,0,0.12)';
-                                e.currentTarget.style.borderColor = 'var(--accent-purple)';
+                                e.currentTarget.style.borderColor = '#f97316';
                             }}
                             onMouseLeave={(e) => {
                                 e.currentTarget.style.transform = 'translateY(0)';
@@ -796,7 +796,7 @@ export default function UserProfile({ params }) {
                             <div style={{
                                 width: '60px',
                                 height: '60px',
-                                background: 'linear-gradient(135deg, var(--accent-purple) 0%, #764ba2 100%)',
+                                background: 'linear-gradient(135deg, #fbbf24 0%, #f97316 50%, #ec4899 100%)',
                                 borderRadius: '15px',
                                 display: 'flex',
                                 alignItems: 'center',
@@ -810,7 +810,7 @@ export default function UserProfile({ params }) {
                             <div style={{
                                 fontSize: '2.5rem',
                                 fontWeight: 'bold',
-                                color: 'var(--accent-purple)',
+                                color: '#f97316',
                                 marginBottom: '0.5rem'
                             }}>
                                 {posts.length}
@@ -894,7 +894,7 @@ export default function UserProfile({ params }) {
                                 flex: 1,
                                 padding: isMobile ? '0.75rem 1rem' : '1rem 2rem',
                                 background: activeTab === 'posts'
-                                    ? 'linear-gradient(135deg, var(--accent-purple) 0%, #764ba2 100%)'
+                                    ? 'linear-gradient(135deg, #fbbf24 0%, #f97316 50%, #ec4899 100%)'
                                     : 'transparent',
                                 color: activeTab === 'posts' ? 'white' : 'var(--text-secondary)',
                                 border: 'none',
@@ -903,7 +903,7 @@ export default function UserProfile({ params }) {
                                 fontWeight: '700',
                                 fontSize: isMobile ? '0.85rem' : '1rem',
                                 transition: 'all 0.3s ease',
-                                boxShadow: activeTab === 'posts' ? '0 5px 20px rgba(102, 126, 234, 0.4)' : 'none'
+                                boxShadow: activeTab === 'posts' ? '0 5px 20px rgba(249, 115, 22, 0.4)' : 'none'
                             }}
                             onMouseEnter={(e) => {
                                 if (activeTab !== 'posts') {
@@ -967,8 +967,8 @@ export default function UserProfile({ params }) {
                                 }}
                                 onMouseEnter={(e) => {
                                     e.currentTarget.style.transform = 'translateY(-5px)';
-                                    e.currentTarget.style.boxShadow = '0 15px 40px rgba(102, 126, 234, 0.2)';
-                                    e.currentTarget.style.borderColor = 'var(--accent-purple)';
+                                    e.currentTarget.style.boxShadow = '0 15px 40px rgba(249, 115, 22, 0.2)';
+                                    e.currentTarget.style.borderColor = '#f97316';
                                 }}
                                 onMouseLeave={(e) => {
                                     e.currentTarget.style.transform = 'translateY(0)';
