@@ -67,6 +67,26 @@ body {
     box-sizing: border-box;
 }
 
+/* Select and Option styling for dark theme compatibility */
+select {
+    background-color: var(--secondary);
+    color: var(--text);
+    border: 1px solid var(--border);
+}
+
+select option {
+    background-color: var(--secondary);
+    color: var(--text);
+    padding: 0.5rem;
+}
+
+select option:hover,
+select option:focus,
+select option:checked {
+    background-color: var(--background);
+    color: var(--text);
+}
+
 @keyframes shake {
 
     0%,

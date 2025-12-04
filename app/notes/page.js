@@ -171,13 +171,12 @@ export default function Notes() {
     const inputStyle = {
         padding: '1rem 1.25rem',
         borderRadius: '14px',
-        border: '2px solid transparent',
-        backgroundColor: 'rgba(255,255,255,0.05)',
+        border: '2px solid var(--border)',
+        backgroundColor: 'var(--secondary)',
         color: 'var(--text)',
         fontSize: '1rem',
         outline: 'none',
-        transition: 'all 0.3s ease',
-        backdropFilter: 'blur(10px)'
+        transition: 'all 0.3s ease'
     };
 
     return (
