@@ -1,14 +1,45 @@
 'use client';
 
-import { useState, useEffect, Suspense } from 'react';
+import { useState, useEffect, useRef, useCallback, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { useSession } from 'next-auth/react';
+
+// Debounce hook
+function useDebounce(value, delay) {
+    const [debouncedValue, setDebouncedValue] = useState(value);
+    useEffect(() => {
+        const handler = setTimeout(() => setDebouncedValue(value), delay);
+        return () => clearTimeout(handler);
+    }, [value, delay]);
+    return debouncedValue;
+}
+
+// Highlight matching text
+function HighlightText({ text, query }) {
+    if (!query || !text) return <>{text}</>;
+    const parts = text.split(new RegExp(`(${query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi'));
+    return (
+        <>
+            {parts.map((part, i) =>
+                part.toLowerCase() === query.toLowerCase() ? (
+                    <mark key={i} style={{
+                        background: 'linear-gradient(135deg, rgba(251, 191, 36, 0.3), rgba(249, 115, 22, 0.3))',
+                        color: 'inherit',
+                        padding: '0 2px',
+                        borderRadius: '3px'
+                    }}>{part}</mark>
+                ) : part
+            )}
+        </>
+    );
+}
 
 function SearchPageContent() {
     const router = useRouter();
     const searchParams = useSearchParams();
     const { data: session } = useSession();
+    const inputRef = useRef(null);
 
     const [query, setQuery] = useState(searchParams.get('q') || '');
     const [results, setResults] = useState(null);
@@ -19,9 +50,13 @@ function SearchPageContent() {
     const [suggestions, setSuggestions] = useState({ trending: [], trendingPosts: [] });
     const [showAutocomplete, setShowAutocomplete] = useState(false);
     const [autocompleteResults, setAutocompleteResults] = useState([]);
+    const [selectedIndex, setSelectedIndex] = useState(-1);
     const [isMobile, setIsMobile] = useState(false);
-
+    const [isSearching, setIsSearching] = useState(false);
     const [announcements, setAnnouncements] = useState([]);
+
+    // Debounced query for autocomplete
+    const debouncedQuery = useDebounce(query, 300);
 
     useEffect(() => {
         const checkMobile = () => setIsMobile(window.innerWidth <= 767);
@@ -48,7 +83,6 @@ function SearchPageContent() {
         }
     };
 
-
     useEffect(() => {
         const q = searchParams.get('q');
         if (q) {
@@ -56,6 +90,28 @@ function SearchPageContent() {
             performSearch(q);
         }
     }, [searchParams]);
+
+    // Debounced autocomplete fetch
+    useEffect(() => {
+        if (debouncedQuery.trim().length > 1) {
+            setIsSearching(true);
+            fetch(`/api/search/suggestions?q=${encodeURIComponent(debouncedQuery)}`)
+                .then(res => res.json())
+                .then(data => {
+                    const historyMatches = history.filter(h =>
+                        h.toLowerCase().includes(debouncedQuery.toLowerCase())
+                    ).slice(0, 3);
+                    const apiSuggestions = data.suggestions || [];
+                    const combined = [...new Set([...historyMatches, ...apiSuggestions])].slice(0, 8);
+                    setAutocompleteResults(combined);
+                    setSelectedIndex(-1);
+                })
+                .catch(err => console.error(err))
+                .finally(() => setIsSearching(false));
+        } else {
+            setAutocompleteResults([]);
+        }
+    }, [debouncedQuery, history]);
 
     const fetchHistory = async () => {
         try {
@@ -114,20 +170,56 @@ function SearchPageContent() {
         const val = e.target.value;
         setQuery(val);
         setShowAutocomplete(val.trim().length > 0);
+        setSelectedIndex(-1);
+    };
 
-        if (val.trim().length > 1) {
-            fetch(`/api/search/suggestions?q=${encodeURIComponent(val)}`)
-                .then(res => res.json())
-                .then(data => {
-                    const historyMatches = history.filter(h => h.toLowerCase().includes(val.toLowerCase()));
-                    const apiSuggestions = data.suggestions || [];
-                    const combined = [...new Set([...historyMatches, ...apiSuggestions])];
-                    setAutocompleteResults(combined);
-                })
-                .catch(err => console.error(err));
-        } else {
-            setAutocompleteResults([]);
+    // Keyboard navigation for autocomplete
+    const handleKeyDown = useCallback((e) => {
+        if (!showAutocomplete || autocompleteResults.length === 0) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                if (query.trim()) {
+                    router.push(`/search?q=${encodeURIComponent(query)}`);
+                }
+            }
+            return;
         }
+
+        switch (e.key) {
+            case 'ArrowDown':
+                e.preventDefault();
+                setSelectedIndex(prev =>
+                    prev < autocompleteResults.length - 1 ? prev + 1 : 0
+                );
+                break;
+            case 'ArrowUp':
+                e.preventDefault();
+                setSelectedIndex(prev =>
+                    prev > 0 ? prev - 1 : autocompleteResults.length - 1
+                );
+                break;
+            case 'Enter':
+                e.preventDefault();
+                if (selectedIndex >= 0 && autocompleteResults[selectedIndex]) {
+                    const selected = autocompleteResults[selectedIndex];
+                    setQuery(selected);
+                    setShowAutocomplete(false);
+                    router.push(`/search?q=${encodeURIComponent(selected)}`);
+                } else if (query.trim()) {
+                    router.push(`/search?q=${encodeURIComponent(query)}`);
+                }
+                break;
+            case 'Escape':
+                setShowAutocomplete(false);
+                setSelectedIndex(-1);
+                break;
+        }
+    }, [showAutocomplete, autocompleteResults, selectedIndex, query, router]);
+
+    const selectSuggestion = (item) => {
+        setQuery(item);
+        setShowAutocomplete(false);
+        router.push(`/search?q=${encodeURIComponent(item)}`);
     };
 
     const clearHistory = async () => {
@@ -189,6 +281,7 @@ function SearchPageContent() {
         width: '100%',
         padding: '1.25rem 1.5rem',
         paddingLeft: '3.5rem',
+        paddingRight: isSearching ? '3.5rem' : '1.5rem',
         fontSize: '1.1rem',
         border: '2px solid var(--border)',
         borderRadius: '16px',
@@ -209,6 +302,19 @@ function SearchPageContent() {
         pointerEvents: 'none'
     };
 
+    const loadingSpinnerStyle = {
+        position: 'absolute',
+        right: '1.25rem',
+        top: '50%',
+        transform: 'translateY(-50%)',
+        width: '20px',
+        height: '20px',
+        border: '2px solid var(--border)',
+        borderTopColor: '#f97316',
+        borderRadius: '50%',
+        animation: 'spin 1s linear infinite'
+    };
+
     const autocompleteStyle = {
         position: 'absolute',
         top: 'calc(100% + 0.5rem)',
@@ -224,7 +330,7 @@ function SearchPageContent() {
         backdropFilter: 'blur(10px)'
     };
 
-    const autocompleteItemStyle = {
+    const autocompleteItemStyle = (isSelected) => ({
         padding: '1rem 1.25rem',
         cursor: 'pointer',
         borderBottom: '1px solid var(--border)',
@@ -232,8 +338,9 @@ function SearchPageContent() {
         color: 'var(--text)',
         display: 'flex',
         alignItems: 'center',
-        gap: '0.75rem'
-    };
+        gap: '0.75rem',
+        backgroundColor: isSelected ? 'var(--background)' : 'transparent'
+    });
 
     const filterContainerStyle = {
         display: 'flex',
@@ -310,6 +417,12 @@ function SearchPageContent() {
                 zIndex: 0
             }} />
 
+            <style jsx>{`
+                @keyframes spin {
+                    to { transform: translateY(-50%) rotate(360deg); }
+                }
+            `}</style>
+
             <div style={{ ...contentStyle, position: 'relative', zIndex: 1 }}>
                 {/* Header */}
                 <div style={headerStyle}>
@@ -321,60 +434,74 @@ function SearchPageContent() {
                 <form onSubmit={handleSearch} style={searchBoxStyle}>
                     <span style={searchIconStyle}>🔍</span>
                     <input
+                        ref={inputRef}
                         type="text"
                         value={query}
                         onChange={handleQueryChange}
+                        onKeyDown={handleKeyDown}
                         placeholder="Ne aramak istiyorsun?"
                         style={inputStyle}
                         onFocus={(e) => {
                             e.currentTarget.style.borderColor = '#f97316';
                             e.currentTarget.style.boxShadow = '0 0 0 4px rgba(249, 115, 22, 0.1)';
+                            if (query.trim()) setShowAutocomplete(true);
                         }}
                         onBlur={(e) => {
                             e.currentTarget.style.borderColor = 'var(--border)';
                             e.currentTarget.style.boxShadow = '0 4px 20px rgba(0,0,0,0.05)';
                             setTimeout(() => setShowAutocomplete(false), 200);
                         }}
+                        autoComplete="off"
                     />
+                    {isSearching && <div style={loadingSpinnerStyle} />}
 
-                    {/* Autocomplete */}
+                    {/* Autocomplete with keyboard navigation */}
                     {showAutocomplete && query.trim() && (autocompleteResults.length > 0 || history.length > 0) && (
                         <div style={autocompleteStyle}>
                             {autocompleteResults.length > 0 ? (
                                 autocompleteResults.map((item, idx) => (
                                     <div
                                         key={idx}
-                                        onClick={() => {
-                                            setQuery(item);
-                                            setShowAutocomplete(false);
-                                            performSearch(item);
-                                        }}
-                                        style={autocompleteItemStyle}
-                                        onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--background)'}
-                                        onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+                                        onClick={() => selectSuggestion(item)}
+                                        style={autocompleteItemStyle(idx === selectedIndex)}
+                                        onMouseEnter={() => setSelectedIndex(idx)}
                                     >
-                                        <span style={{ fontSize: '1rem', opacity: 0.6 }}>🔍</span>
-                                        <span style={{ fontWeight: '500' }}>{item}</span>
+                                        <span style={{ fontSize: '1rem', opacity: 0.6 }}>
+                                            {history.includes(item) ? '🕒' : '🔍'}
+                                        </span>
+                                        <span style={{ fontWeight: '500' }}>
+                                            <HighlightText text={item} query={query} />
+                                        </span>
                                     </div>
                                 ))
                             ) : (
                                 history.filter(h => h.toLowerCase().includes(query.toLowerCase())).slice(0, 5).map((item, idx) => (
                                     <div
                                         key={idx}
-                                        onClick={() => {
-                                            setQuery(item);
-                                            setShowAutocomplete(false);
-                                            performSearch(item);
-                                        }}
-                                        style={autocompleteItemStyle}
-                                        onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--background)'}
-                                        onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+                                        onClick={() => selectSuggestion(item)}
+                                        style={autocompleteItemStyle(idx === selectedIndex)}
+                                        onMouseEnter={() => setSelectedIndex(idx)}
                                     >
                                         <span style={{ fontSize: '1rem', opacity: 0.6 }}>🕒</span>
-                                        <span style={{ fontWeight: '500' }}>{item}</span>
+                                        <span style={{ fontWeight: '500' }}>
+                                            <HighlightText text={item} query={query} />
+                                        </span>
                                     </div>
                                 ))
                             )}
+                            {/* Keyboard hint */}
+                            <div style={{
+                                padding: '0.75rem 1.25rem',
+                                borderTop: '1px solid var(--border)',
+                                fontSize: '0.8rem',
+                                color: 'var(--text-secondary)',
+                                display: 'flex',
+                                gap: '1rem'
+                            }}>
+                                <span>↑↓ gezin</span>
+                                <span>Enter seç</span>
+                                <span>Esc kapat</span>
+                            </div>
                         </div>
                     )}
                 </form>
@@ -455,11 +582,6 @@ function SearchPageContent() {
                             margin: '0 auto 1rem'
                         }} />
                         Aranıyor...
-                        <style jsx>{`
-                            @keyframes spin {
-                                to { transform: rotate(360deg); }
-                            }
-                        `}</style>
                     </div>
                 ) : results ? (
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
@@ -483,9 +605,11 @@ function SearchPageContent() {
                                                 e.currentTarget.style.transform = 'translateY(0)';
                                                 e.currentTarget.style.boxShadow = 'none';
                                             }}>
-                                            <h3 style={{ fontSize: '1.1rem', color: 'var(--text)', marginBottom: '0.5rem', fontWeight: '600' }}>{post.title}</h3>
+                                            <h3 style={{ fontSize: '1.1rem', color: 'var(--text)', marginBottom: '0.5rem', fontWeight: '600' }}>
+                                                <HighlightText text={post.title} query={query} />
+                                            </h3>
                                             <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', marginBottom: '0.75rem', lineHeight: '1.5' }}>
-                                                {post.content.substring(0, 150)}...
+                                                <HighlightText text={post.content.substring(0, 150) + '...'} query={query} />
                                             </p>
                                             <div style={{ display: 'flex', gap: '1rem', fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
                                                 <span style={{ fontWeight: '500' }}>{post.author.name}</span>
@@ -510,10 +634,10 @@ function SearchPageContent() {
                                             borderColor: 'rgba(249, 115, 22, 0.2)'
                                         }}>
                                             <h3 style={{ fontSize: '1.1rem', fontWeight: '600', marginBottom: '0.5rem', color: 'var(--text)' }}>
-                                                {announcement.title}
+                                                <HighlightText text={announcement.title} query={query} />
                                             </h3>
                                             <p style={{ color: 'var(--text)', lineHeight: '1.6', fontSize: '0.95rem' }}>
-                                                {announcement.content}
+                                                <HighlightText text={announcement.content} query={query} />
                                             </p>
                                             <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginTop: '0.75rem' }}>
                                                 {new Date(announcement.createdAt).toLocaleDateString('tr-TR')} - {announcement.author.name}
@@ -561,10 +685,61 @@ function SearchPageContent() {
                                                 {user.avatar ? <img src={user.avatar} style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : user.name[0]}
                                             </div>
                                             <div>
-                                                <div style={{ fontWeight: '600', color: 'var(--text)', fontSize: '1rem' }}>{user.name}</div>
+                                                <div style={{ fontWeight: '600', color: 'var(--text)', fontSize: '1rem' }}>
+                                                    <HighlightText text={user.name} query={query} />
+                                                </div>
                                                 <div style={{ fontSize: '0.9rem', color: '#f97316' }}>@{user.username}</div>
                                             </div>
                                         </Link>
+                                    ))}
+                                </div>
+                            </section>
+                        )}
+
+                        {/* Notes */}
+                        {results.notes && results.notes.length > 0 && (
+                            <section>
+                                <h2 style={sectionTitleStyle}>📝 Notlar</h2>
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                                    {results.notes.map(note => (
+                                        <Link key={note.id} href={`/notes/${note.id}`} style={{
+                                            ...cardStyle,
+                                            textDecoration: 'none'
+                                        }}
+                                            onMouseEnter={(e) => {
+                                                e.currentTarget.style.borderColor = '#f97316';
+                                                e.currentTarget.style.transform = 'translateY(-2px)';
+                                            }}
+                                            onMouseLeave={(e) => {
+                                                e.currentTarget.style.borderColor = 'var(--border)';
+                                                e.currentTarget.style.transform = 'translateY(0)';
+                                            }}>
+                                            <h3 style={{ fontSize: '1.1rem', color: 'var(--text)', marginBottom: '0.5rem', fontWeight: '600' }}>
+                                                <HighlightText text={note.title} query={query} />
+                                            </h3>
+                                            <div style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
+                                                {note.author?.name}
+                                            </div>
+                                        </Link>
+                                    ))}
+                                </div>
+                            </section>
+                        )}
+
+                        {/* Courses */}
+                        {results.courses && results.courses.length > 0 && (
+                            <section>
+                                <h2 style={sectionTitleStyle}>📚 Dersler</h2>
+                                <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(auto-fill, minmax(250px, 1fr))', gap: '1rem' }}>
+                                    {results.courses.map(course => (
+                                        <div key={course.id} style={cardStyle}>
+                                            <h3 style={{ fontSize: '1rem', color: 'var(--text)', marginBottom: '0.25rem', fontWeight: '600' }}>
+                                                <HighlightText text={course.name} query={query} />
+                                            </h3>
+                                            <div style={{ fontSize: '0.85rem', color: '#f97316' }}>
+                                                {course.code}
+                                            </div>
+                                        </div>
                                     ))}
                                 </div>
                             </section>

@@ -12,9 +12,6 @@ export async function GET(req) {
         const { searchParams } = new URL(req.url);
         const query = searchParams.get('q') || '';
         const type = searchParams.get('type') || 'all'; // all, posts, users, notes, courses, announcements
-
-        // Sorting is now handled by our relevance algorithm by default, 
-        // but we keep the parameter if user explicitly wants date/popularity
         const sort = searchParams.get('sort') || 'relevance';
 
         if (!query.trim()) {
@@ -22,7 +19,7 @@ export async function GET(req) {
         }
 
         const lowerQuery = query.toLowerCase();
-        const queryTerms = lowerQuery.split(/\s+/).filter(t => t.length > 2); // Split into terms, ignore short words
+        const queryTerms = lowerQuery.split(/\s+/).filter(t => t.length > 2);
 
         // Helper to calculate relevance score
         const calculateScore = (item, titleField = 'title', contentField = 'content') => {
@@ -48,16 +45,16 @@ export async function GET(req) {
                 if (content.includes(term)) score += 1;
             });
 
-            // 6. Recency Boost (Small boost for newer items)
+            // 6. Recency Boost
             if (item.createdAt) {
                 const daysOld = (new Date() - new Date(item.createdAt)) / (1000 * 60 * 60 * 24);
-                if (daysOld < 7) score += 5; // New items get a boost
+                if (daysOld < 7) score += 5;
                 if (daysOld < 30) score += 2;
             }
 
-            // 7. Popularity Boost (if available)
+            // 7. Popularity Boost
             if (item.viewCount) {
-                score += Math.min(item.viewCount / 100, 10); // Cap at 10 points
+                score += Math.min(item.viewCount / 100, 10);
             }
 
             return score;
@@ -71,7 +68,7 @@ export async function GET(req) {
             announcements: []
         };
 
-        // --- SEARCH POSTS ---
+        // --- SEARCH POSTS (Case-insensitive) ---
         if (type === 'all' || type === 'posts') {
             try {
                 const posts = await prismaClient.post.findMany({
@@ -81,9 +78,9 @@ export async function GET(req) {
                             { isDeleted: false },
                             {
                                 OR: [
-                                    { title: { contains: query } },
-                                    { content: { contains: query } },
-                                    { tags: { contains: query } }
+                                    { title: { contains: query, mode: 'insensitive' } },
+                                    { content: { contains: query, mode: 'insensitive' } },
+                                    { tags: { contains: query, mode: 'insensitive' } }
                                 ]
                             }
                         ]
@@ -92,31 +89,30 @@ export async function GET(req) {
                         author: { select: { name: true, username: true, avatar: true } },
                         _count: { select: { replies: true, votes: true } }
                     },
-                    take: 50 // Fetch more to sort by relevance
+                    take: 50
                 });
 
                 results.posts = posts
                     .map(p => ({ ...p, score: calculateScore(p, 'title', 'content') }))
-                    .sort((a, b) => sort === 'relevance' ? b.score - a.score : 0) // Sort by score
-                    .slice(0, 20); // Return top 20
+                    .sort((a, b) => sort === 'relevance' ? b.score - a.score : 0)
+                    .slice(0, 20);
 
-                // If explicit sort is requested, re-sort
                 if (sort === 'date') results.posts.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
                 if (sort === 'popularity') results.posts.sort((a, b) => b.viewCount - a.viewCount);
 
             } catch (e) { console.error('Error searching posts:', e); }
         }
 
-        // --- SEARCH USERS ---
+        // --- SEARCH USERS (Case-insensitive) ---
         if (type === 'all' || type === 'users') {
             try {
                 const users = await prismaClient.user.findMany({
                     where: {
                         OR: [
-                            { name: { contains: query } },
-                            { username: { contains: query } },
-                            { university: { contains: query } },
-                            { department: { contains: query } }
+                            { name: { contains: query, mode: 'insensitive' } },
+                            { username: { contains: query, mode: 'insensitive' } },
+                            { university: { contains: query, mode: 'insensitive' } },
+                            { department: { contains: query, mode: 'insensitive' } }
                         ]
                     },
                     select: { id: true, name: true, username: true, avatar: true, university: true, department: true },
@@ -130,7 +126,7 @@ export async function GET(req) {
             } catch (e) { console.error('Error searching users:', e); }
         }
 
-        // --- SEARCH NOTES ---
+        // --- SEARCH NOTES (Case-insensitive) ---
         if (type === 'all' || type === 'notes') {
             try {
                 const notes = await prismaClient.note.findMany({
@@ -139,8 +135,8 @@ export async function GET(req) {
                             { isDeleted: false },
                             {
                                 OR: [
-                                    { title: { contains: query } },
-                                    { content: { contains: query } }
+                                    { title: { contains: query, mode: 'insensitive' } },
+                                    { content: { contains: query, mode: 'insensitive' } }
                                 ]
                             }
                         ]
@@ -156,15 +152,15 @@ export async function GET(req) {
             } catch (e) { console.error('Error searching notes:', e); }
         }
 
-        // --- SEARCH COURSES ---
+        // --- SEARCH COURSES (Case-insensitive) ---
         if (type === 'all' || type === 'courses') {
             try {
                 const courses = await prismaClient.course.findMany({
                     where: {
                         OR: [
-                            { name: { contains: query } },
-                            { code: { contains: query } },
-                            { department: { contains: query } }
+                            { name: { contains: query, mode: 'insensitive' } },
+                            { code: { contains: query, mode: 'insensitive' } },
+                            { department: { contains: query, mode: 'insensitive' } }
                         ]
                     },
                     take: 20
@@ -177,15 +173,15 @@ export async function GET(req) {
             } catch (e) { console.error('Error searching courses:', e); }
         }
 
-        // --- SEARCH ANNOUNCEMENTS ---
+        // --- SEARCH ANNOUNCEMENTS (Case-insensitive) ---
         if (type === 'all' || type === 'announcements') {
             try {
                 const announcements = await prismaClient.announcement.findMany({
                     where: {
                         active: true,
                         OR: [
-                            { title: { contains: query } },
-                            { content: { contains: query } }
+                            { title: { contains: query, mode: 'insensitive' } },
+                            { content: { contains: query, mode: 'insensitive' } }
                         ]
                     },
                     include: { author: { select: { name: true, username: true } } },

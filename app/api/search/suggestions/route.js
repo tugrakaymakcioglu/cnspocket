@@ -10,34 +10,65 @@ export async function GET(req) {
         const { searchParams } = new URL(req.url);
         const query = searchParams.get('q');
 
-        if (query) {
-            // Autocomplete suggestions
-            const users = await prismaClient.user.findMany({
-                where: {
-                    OR: [
-                        { name: { contains: query } },
-                        { username: { contains: query } }
-                    ]
-                },
-                take: 3,
-                select: { name: true, username: true }
-            });
-
-            const posts = await prismaClient.post.findMany({
-                where: {
-                    title: { contains: query }
-                },
-                take: 3,
-                select: { title: true }
-            });
+        if (query && query.trim().length > 0) {
+            // Autocomplete suggestions (Case-insensitive)
+            const [users, posts, courses] = await Promise.all([
+                prismaClient.user.findMany({
+                    where: {
+                        OR: [
+                            { name: { contains: query, mode: 'insensitive' } },
+                            { username: { contains: query, mode: 'insensitive' } }
+                        ]
+                    },
+                    take: 3,
+                    select: { name: true, username: true }
+                }),
+                prismaClient.post.findMany({
+                    where: {
+                        AND: [
+                            { isVisible: true },
+                            { isDeleted: false },
+                            {
+                                OR: [
+                                    { title: { contains: query, mode: 'insensitive' } },
+                                    { tags: { contains: query, mode: 'insensitive' } }
+                                ]
+                            }
+                        ]
+                    },
+                    take: 5,
+                    select: { title: true },
+                    orderBy: { viewCount: 'desc' }
+                }),
+                prismaClient.course.findMany({
+                    where: {
+                        OR: [
+                            { name: { contains: query, mode: 'insensitive' } },
+                            { code: { contains: query, mode: 'insensitive' } }
+                        ]
+                    },
+                    take: 3,
+                    select: { name: true, code: true }
+                })
+            ]);
 
             const suggestions = [
-                ...users.map(u => u.name),
-                ...users.map(u => `@${u.username}`),
-                ...posts.map(p => p.title)
+                ...posts.map(p => ({ type: 'post', text: p.title })),
+                ...users.map(u => ({ type: 'user', text: u.name, username: u.username })),
+                ...courses.map(c => ({ type: 'course', text: `${c.code} - ${c.name}` }))
             ];
 
-            return NextResponse.json({ suggestions });
+            // Also return simple string array for backward compatibility
+            const simpleList = [
+                ...posts.map(p => p.title),
+                ...users.map(u => u.name),
+                ...courses.map(c => c.name)
+            ];
+
+            return NextResponse.json({
+                suggestions: simpleList,
+                detailedSuggestions: suggestions
+            });
         }
 
         // Get trending topics (most viewed posts in last 7 days)
@@ -74,12 +105,15 @@ export async function GET(req) {
         // Count frequency
         const queryCount = {};
         popularSearches.forEach(s => {
-            queryCount[s.query] = (queryCount[s.query] || 0) + 1;
+            const q = s.query.toLowerCase().trim();
+            if (q.length > 1) {
+                queryCount[q] = (queryCount[q] || 0) + 1;
+            }
         });
 
         const trending = Object.entries(queryCount)
             .sort((a, b) => b[1] - a[1])
-            .slice(0, 5)
+            .slice(0, 8)
             .map(([query]) => query);
 
         return NextResponse.json({
