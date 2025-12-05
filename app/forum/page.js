@@ -601,46 +601,50 @@ export default function Forum() {
                                     {/* Footer: Files & Stats */}
                                     <div style={{
                                         display: 'flex',
+                                        flexDirection: isMobile ? 'column' : 'row',
                                         justifyContent: 'space-between',
-                                        alignItems: 'center',
+                                        alignItems: isMobile ? 'stretch' : 'center',
                                         paddingTop: '1rem',
                                         borderTop: '1px solid var(--border)',
-                                        gap: '0.75rem',
-                                        flexWrap: 'wrap'
+                                        gap: isMobile ? '0.75rem' : '0.75rem'
                                     }}>
                                         {/* Files */}
-                                        <div style={{ flex: 1, minWidth: 0 }}>
-                                            {q.fileUrls && (() => {
-                                                try {
-                                                    const urls = JSON.parse(q.fileUrls);
-                                                    if (urls.length > 0) {
-                                                        return (
-                                                            <div style={{ display: 'flex', gap: '0.4rem', flexWrap: 'wrap' }}>
-                                                                {urls.slice(0, isMobile ? 1 : 2).map((url, index) => (
-                                                                    <FileBadge key={index} url={url} />
-                                                                ))}
-                                                                {urls.length > (isMobile ? 1 : 2) && (
-                                                                    <span style={{
-                                                                        fontSize: '0.75rem',
-                                                                        color: 'var(--text-secondary)',
-                                                                        padding: '0.25rem 0.5rem'
-                                                                    }}>
-                                                                        +{urls.length - (isMobile ? 1 : 2)} dosya
-                                                                    </span>
-                                                                )}
-                                                            </div>
-                                                        );
-                                                    }
-                                                } catch (e) { return null; }
-                                            })()}
-                                        </div>
+                                        {q.fileUrls && (() => {
+                                            try {
+                                                const urls = JSON.parse(q.fileUrls);
+                                                if (urls.length > 0) {
+                                                    return (
+                                                        <div style={{
+                                                            display: 'flex',
+                                                            gap: '0.4rem',
+                                                            flexWrap: 'wrap',
+                                                            minWidth: 0
+                                                        }}>
+                                                            {urls.slice(0, isMobile ? 2 : 2).map((url, index) => (
+                                                                <FileBadge key={index} url={url} />
+                                                            ))}
+                                                            {urls.length > 2 && (
+                                                                <span style={{
+                                                                    fontSize: '0.75rem',
+                                                                    color: 'var(--text-secondary)',
+                                                                    padding: '0.25rem 0.5rem'
+                                                                }}>
+                                                                    +{urls.length - 2} dosya
+                                                                </span>
+                                                            )}
+                                                        </div>
+                                                    );
+                                                }
+                                            } catch (e) { return null; }
+                                        })()}
 
                                         {/* Stats */}
                                         <div style={{
                                             display: 'flex',
                                             gap: '0.4rem',
                                             flexWrap: 'wrap',
-                                            justifyContent: 'flex-end'
+                                            justifyContent: isMobile ? 'flex-start' : 'flex-end',
+                                            flexShrink: 0
                                         }}>
                                             {/* Views */}
                                             <span style={{

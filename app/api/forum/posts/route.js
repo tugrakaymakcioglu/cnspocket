@@ -5,6 +5,8 @@ import prisma from '@/lib/prisma';
 import { writeFile, mkdir } from 'fs/promises';
 import { existsSync } from 'fs';
 import path from 'path';
+import { rateLimiters, applyRateLimit } from '@/lib/rate-limiter';
+import { logSecurityEvent, getSecurityInfo } from '@/lib/security';
 
 export async function GET(req) {
     try {
@@ -33,7 +35,7 @@ export async function GET(req) {
                         votes: true
                     }
                 },
-                votes: true // Include votes to check if current user voted (will filter in frontend or map here if needed, but keeping simple for now)
+                votes: true
             },
             orderBy: {
                 createdAt: 'desc'
@@ -66,6 +68,19 @@ export async function GET(req) {
 }
 
 export async function POST(req) {
+    // Apply rate limiting - 3 posts per minute
+    const rateLimit = applyRateLimit(req, rateLimiters.forumPost);
+    if (rateLimit.limited) {
+        logSecurityEvent('RATE_LIMIT_FORUM_POST', getSecurityInfo(req));
+        return NextResponse.json(
+            rateLimit.response.body,
+            {
+                status: rateLimit.response.status,
+                headers: rateLimit.response.headers,
+            }
+        );
+    }
+
     try {
         const session = await getServerSession(authOptions);
 

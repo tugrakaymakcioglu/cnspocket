@@ -1,8 +1,23 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import bcrypt from "bcryptjs";
+import { rateLimiters, applyRateLimit } from "@/lib/rate-limiter";
+import { logSecurityEvent, getSecurityInfo } from "@/lib/security";
 
 export async function POST(req) {
+    // Apply rate limiting - 5 requests per 15 minutes
+    const rateLimit = applyRateLimit(req, rateLimiters.register);
+    if (rateLimit.limited) {
+        logSecurityEvent('RATE_LIMIT_REGISTER', getSecurityInfo(req));
+        return NextResponse.json(
+            rateLimit.response.body,
+            {
+                status: rateLimit.response.status,
+                headers: rateLimit.response.headers,
+            }
+        );
+    }
+
     try {
         const { name, email, password } = await req.json();
 

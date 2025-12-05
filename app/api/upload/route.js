@@ -4,11 +4,26 @@ import { existsSync } from 'fs';
 import path from 'path';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
+import { rateLimiters, applyRateLimit } from '@/lib/rate-limiter';
+import { logSecurityEvent, getSecurityInfo } from '@/lib/security';
 
 // Next.js 15: bodyParser config is deprecated, formData() handles file uploads automatically
 // No config needed - formData() works out of the box
 
 export async function POST(req) {
+    // Apply rate limiting - 5 uploads per minute
+    const rateLimit = applyRateLimit(req, rateLimiters.upload);
+    if (rateLimit.limited) {
+        logSecurityEvent('RATE_LIMIT_UPLOAD', getSecurityInfo(req));
+        return NextResponse.json(
+            rateLimit.response.body,
+            {
+                status: rateLimit.response.status,
+                headers: rateLimit.response.headers,
+            }
+        );
+    }
+
     try {
         const session = await getServerSession(authOptions);
         if (!session?.user?.email) {
